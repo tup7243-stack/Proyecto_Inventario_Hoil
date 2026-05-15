@@ -124,7 +124,8 @@ export async function getKpiMaterialesTotal(): Promise<number> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("materiales")
-    .select("cantidad_total");
+    .select("cantidad_total")
+    .eq("activo", true);
 
   return (data || []).reduce(
     (sum, m) => sum + (m.cantidad_total || 0),
@@ -144,7 +145,8 @@ export async function getKpiStockBajo(): Promise<{
   const [{ data: materiales }, activeLoans] = await Promise.all([
     supabase
       .from("materiales")
-      .select("id, nombre, cantidad_total, stock_minimo, estado"),
+      .select("id, nombre, cantidad_total, stock_minimo, estado")
+      .eq("activo", true),
     getActiveLoansByMaterial(),
   ]);
 
@@ -188,7 +190,7 @@ export async function getPrestadoVsDisponible(): Promise<{
 }> {
   const supabase = await createClient();
   const [{ data: materiales }, activeLoans] = await Promise.all([
-    supabase.from("materiales").select("cantidad_total"),
+    supabase.from("materiales").select("cantidad_total").eq("activo", true),
     getActiveLoansByMaterial(),
   ]);
 
@@ -324,7 +326,8 @@ export async function getEstadoMateriales(): Promise<{
   const supabase = await createClient();
   const { data } = await supabase
     .from("materiales")
-    .select("estado");
+    .select("estado")
+    .eq("activo", true);
 
   const counts = { bueno: 0, desgastado: 0, dañado: 0 };
   for (const m of data || []) {
@@ -348,7 +351,8 @@ export async function getConsumiblesAgotados(): Promise<
     supabase
       .from("materiales")
       .select("id, nombre, cantidad_total, stock_minimo, estado")
-      .eq("categoria", "consumible"),
+      .eq("categoria", "consumible")
+      .eq("activo", true),
     getActiveLoansByMaterial(),
   ]);
 

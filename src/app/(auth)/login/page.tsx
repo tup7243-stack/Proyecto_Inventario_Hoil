@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Loader2, LogIn, Package } from "lucide-react";
+import { Eye, EyeOff, Loader2, LogIn, Package } from "lucide-react";
 
 /**
  * Login page — email/password authentication via Supabase Auth.
@@ -16,8 +16,14 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const callbackError = new URLSearchParams(window.location.search).get("error");
+    if (callbackError) setError(callbackError);
+  }, []);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -58,6 +64,29 @@ export default function LoginPage() {
     } catch {
       setError("Error inesperado al iniciar sesión. Intenta de nuevo.");
     } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleGoogleSignIn() {
+    setError(null);
+    setLoading(true);
+
+    try {
+      const supabase = createClient();
+      const { error: authError } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (authError) {
+        setError(authError.message);
+        setLoading(false);
+      }
+    } catch {
+      setError("No se pudo iniciar sesión con Google.");
       setLoading(false);
     }
   }
@@ -115,17 +144,32 @@ export default function LoginPage() {
               >
                 Contraseña
               </label>
-              <input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus:border-cecyte-primary focus:outline-none focus:ring-1 focus:ring-cecyte-primary disabled:opacity-50"
-                disabled={loading}
-                autoComplete="current-password"
-              />
+              <div className="relative mt-1">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Escribe tu contraseña"
+                  className="block w-full rounded-md border border-input bg-background px-3 py-2 pr-11 text-sm shadow-sm placeholder:text-muted-foreground focus:border-cecyte-primary focus:outline-none focus:ring-1 focus:ring-cecyte-primary disabled:opacity-50"
+                  disabled={loading}
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((visible) => !visible)}
+                  className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-muted-foreground hover:text-foreground"
+                  aria-label={showPassword ? "Ocultar clave" : "Mostrar clave"}
+                  disabled={loading}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -145,6 +189,25 @@ export default function LoginPage() {
                 Iniciar sesión
               </>
             )}
+          </Button>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-muted-foreground">o</span>
+            </div>
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={loading}
+            onClick={handleGoogleSignIn}
+          >
+            Continuar con Google
           </Button>
         </form>
       </div>

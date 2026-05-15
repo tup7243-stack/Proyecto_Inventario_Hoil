@@ -9,6 +9,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { RealtimeRefresh } from "@/components/realtime-refresh";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -45,27 +46,27 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen flex-col md:flex-row">
+    <div className="flex min-h-screen flex-col md:h-screen md:overflow-hidden">
       {/* Sidebar — Desktop */}
-      <aside className="hidden md:flex md:w-64 md:flex-col md:border-r md:bg-cecyte-primary md:text-white">
+      <aside className="hidden md:fixed md:inset-y-0 md:left-0 md:flex md:h-screen md:w-64 md:flex-col md:overflow-hidden md:border-r md:bg-cecyte-primary md:text-white">
         {/* Logo / Brand */}
-        <div className="flex items-center gap-2 border-b border-white/10 px-6 py-5">
+        <div className="flex shrink-0 items-center gap-2 border-b border-white/10 px-5 py-4">
           <Package className="h-6 w-6" />
           <span className="text-lg font-bold">Inventario CECYTE</span>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 space-y-1 px-3 py-4">
+        <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-3">
           {navItems.map(({ href, label, icon: Icon }) => (
             <NavLink key={href} href={href}>
-              <Icon className="h-5 w-5" />
+              <Icon className="h-4 w-4" />
               <span>{label}</span>
             </NavLink>
           ))}
         </nav>
 
         {/* Footer */}
-        <div className="border-t border-white/10 px-3 py-4">
+        <div className="shrink-0 border-t border-white/10 px-3 py-3">
           <p className="px-3 text-xs text-white/60">
             {perfil?.nombre ?? "Administrador"}
           </p>
@@ -82,8 +83,11 @@ export default async function DashboardLayout({
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto bg-gray-50 pb-20 md:pb-0">
+      <main className="flex-1 overflow-auto bg-gray-50 pb-20 md:ml-64 md:h-screen md:overflow-y-auto md:pb-0">
         <div className="mx-auto max-w-7xl p-4 md:p-6 lg:p-8">
+          <div className="mb-4 flex justify-end">
+            <RealtimeRefresh showStatus />
+          </div>
           {children}
         </div>
       </main>
@@ -121,7 +125,7 @@ function NavLink({
     <Link
       href={href}
       className={cn(
-        "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+        "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white"
       )}
     >
       {children}

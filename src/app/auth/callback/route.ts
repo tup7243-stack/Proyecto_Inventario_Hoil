@@ -53,6 +53,15 @@ export async function GET(request: NextRequest) {
     .eq("id", user.id)
     .single();
 
+  if (!perfil) {
+    await supabase.auth.signOut();
+    return NextResponse.redirect(
+      `${origin}/login?error=${encodeURIComponent(
+        "Tu cuenta no está habilitada en el sistema. Solicita acceso al administrador."
+      )}`
+    );
+  }
+
   // Redirigir al dashboard correcto según el rol
   // Design: admin → /dashboard, representante → /equipo
   const dashboard =

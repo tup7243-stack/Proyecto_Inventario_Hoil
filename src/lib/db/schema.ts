@@ -6,6 +6,7 @@ import {
   text,
   integer,
   timestamp,
+  boolean,
   check,
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
@@ -64,6 +65,8 @@ export const materiales = pgTable(
     estado: text("estado", { enum: ["bueno", "desgastado", "dañado"] })
       .notNull()
       .default("bueno"),
+    activo: boolean("activo").notNull().default(true),
+    eliminadoAt: timestamp("eliminado_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   },
@@ -95,6 +98,7 @@ export const movimientos = pgTable(
         "salida_prestamo",
         "entrada_devolucion",
         "consumo",
+        "eliminacion_material",
       ],
     }).notNull(),
     materialId: uuid("material_id")
@@ -112,10 +116,13 @@ export const movimientos = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   },
   (table) => [
-    check("movimientos_cantidad_check", sql`${table.cantidad} > 0`),
+    check(
+      "movimientos_cantidad_check",
+      sql`(${table.tipo} = 'eliminacion_material' AND ${table.cantidad} >= 0) OR (${table.tipo} <> 'eliminacion_material' AND ${table.cantidad} > 0)`
+    ),
     check(
       "movimientos_tipo_check",
-      sql`${table.tipo} IN ('entrada_stock', 'salida_prestamo', 'entrada_devolucion', 'consumo')`
+      sql`${table.tipo} IN ('entrada_stock', 'salida_prestamo', 'entrada_devolucion', 'consumo', 'eliminacion_material')`
     ),
   ]
 );

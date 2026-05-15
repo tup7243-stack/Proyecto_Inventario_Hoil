@@ -1,7 +1,9 @@
 import "server-only";
 
 import { createServerClient } from "@supabase/ssr";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
+import WebSocket from "ws";
 
 /**
  * Supabase server client — para Server Components, Server Actions, y Route Handlers.
@@ -35,30 +37,26 @@ export async function createClient() {
 
 /**
  * Supabase admin client — usa service_role key para operaciones privilegiadas.
- * Solo usar en Server Actions que requieren bypass de RLS.
+ * Importante: NO usa cookies de usuario. Así evita que la sesión autenticada
+ * reemplace el Authorization header y bloquee mutaciones con RLS.
  * NUNCA exponer al cliente.
  */
 export async function createAdminClient() {
-  const cookieStore = await cookies();
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // Ignore in Server Components
-          }
-        },
+  return createSupabaseClient(supabaseUrl, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+    realtime: {
+      transport: WebSocket as unknown as typeof globalThis.WebSocket,
+    },
+    global: {
+      headers: {
+        Authorization: `Bearer ${serviceRoleKey}`,
       },
-    }
-  );
+    },
+  });
 }
