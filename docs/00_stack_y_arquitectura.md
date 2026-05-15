@@ -70,11 +70,11 @@ Laravel es excelente, pero para este proyecto Next.js + Supabase gana en:
 
 ```
 /                         → Landing / Redirect al dashboard
-/login                    → Login (Supabase Auth UI o custom)
+/login                    → Login custom con contraseña visible/oculta
 /dashboard                → Admin: KPIs y resumen general
-/dashboard/materiales     → Admin: CRUD de materiales
-/dashboard/equipos        → Admin: CRUD de equipos
-/dashboard/usuarios       → Admin: gestión de usuarios
+/dashboard/materiales     → Admin: catálogo, stock y eliminación segura de materiales
+/dashboard/equipos        → Admin: gestión y eliminación segura de equipos
+/dashboard/usuarios       → Admin: gestión y eliminación segura de usuarios/perfiles
 /dashboard/reportes       → Admin: reportes filtrados
 /equipo                   → Representante: su dashboard
 /equipo/pedir             → Representante: pedir material (≤3 clics)

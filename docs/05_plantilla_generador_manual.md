@@ -4,8 +4,7 @@
 Actúa como un redactor técnico experto en UX y educación. Tu objetivo es analizar el código, la lógica de base de datos o las descripciones de interfaz que te proporcionaré, y generar/actualizar el "Manual de Usuario" del Sistema de Inventario del taller de refrigeración del CECYTE.
 
 ## 1. Contexto Académico y del Proyecto
-- **Desarrollador:** Angel Ricardo Teh Catzin (Matrícula: 7433)
-- **Docente Evaludador:** Pedro Antonio Ruiz Martínez
+- **Desarrollador:** Cristian Alejandro Hoil Reyes
 - **Institución Destino:** CECYTE
 - **Público Objetivo del Manual:** Jóvenes de preparatoria (Representantes de equipo) y administradores del taller.
 

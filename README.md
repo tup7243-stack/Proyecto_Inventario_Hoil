@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Inventario HOIL
 
-## Getting Started
+Sistema web para administrar materiales, equipos, usuarios y movimientos del taller de refrigeración de CECYTE.
 
-First, run the development server:
+## Ruta rápida
+
+1. Inicia Supabase local con Podman:
+   ```bash
+   DOCKER_HOST=unix:///run/user/$(id -u)/podman/podman.sock corepack pnpm supabase start
+   ```
+2. Si reiniciaste la base local, carga variables y seed:
+   ```bash
+   set -a && source .env.local && set +a
+   corepack pnpm tsx src/lib/db/seed.ts
+   ```
+3. Levanta la app:
+   ```bash
+   corepack pnpm dev
+   ```
+4. Abre `http://localhost:3000`.
+
+## Estado actual
+
+| Área | Estado |
+|---|---|
+| Login por correo/contraseña y Google | Implementado |
+| Redirección por rol | Implementada |
+| Dashboard admin con KPIs | Implementado |
+| CRUD base de materiales/equipos/perfiles | Implementado |
+| Préstamo, devolución y consumo | Implementados |
+| Realtime para refrescar inventario | Implementado |
+| Reportes | Implementados |
+| Smoke tests E2E | Implementados |
+
+## Credenciales seed
+
+| Rol | Usuario | Contraseña |
+|---|---|---|
+| Admin | `admin@cecyte.edu.mx` | `Admin123!` |
+| Representante 1 | `rep1@cecyte.edu.mx` | `Rep12345!` |
+| Representante 2 | `rep2@cecyte.edu.mx` | `Rep12345!` |
+
+## Comandos útiles
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+corepack pnpm dev
+corepack pnpm verify
+corepack pnpm exec playwright test --workers=1
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+> Si los E2E necesitan conectarse a Supabase local, deben ejecutarse en un entorno que pueda alcanzar `127.0.0.1:54321`; si el navegador está aislado por sandbox, el login fallará aunque las credenciales sean correctas.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Documentación
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- [Arquitectura](./docs/00_stack_y_arquitectura.md)
+- [Contexto y objetivos](./docs/01_contexto_y_objetivos.md)
+- [Roles y requerimientos](./docs/02_requerimientos_y_roles.md)
+- [Catálogo de materiales](./docs/03_catalogo_materiales.md)
+- [UI/UX](./docs/04_ui_ux_y_diseno.md)
+- [Modelo de datos](./docs/06_modelo_base_datos.md)
+- [KPIs y dashboard](./docs/07_kpis_y_dashboard.md)
+- [Estado funcional actual](./docs/08_estado_funcional_actual.md)
+- [Configuración Google OAuth](./docs/09_google_oauth.md)
 
-## Learn More
+## Notas locales importantes
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- En este entorno usa `pnpm` vía Corepack, no `npm`.
+- Si Next muestra `ECONNREFUSED 127.0.0.1:54321`, Supabase local no está disponible.
+- Si `supabase start` queda atorado como “already running”, suele resolverse con:
+  ```bash
+  DOCKER_HOST=unix:///run/user/$(id -u)/podman/podman.sock corepack pnpm supabase stop --no-backup
+  DOCKER_HOST=unix:///run/user/$(id -u)/podman/podman.sock corepack pnpm supabase start
+  ```

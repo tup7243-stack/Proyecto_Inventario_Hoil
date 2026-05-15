@@ -4,11 +4,11 @@
 
 ### 1. Administrador (Docente / Encargado de Taller)
 - Tiene acceso total al sistema.
-- Puede registrar, editar y eliminar materiales del inventario.
+- Puede registrar, editar y eliminar materiales del inventario cuando la trazabilidad lo permita.
 - Puede añadir stock a materiales existentes (entrada de inventario).
-- Puede crear "Equipos de Trabajo".
+- Puede crear, editar y eliminar "Equipos de Trabajo" cuando no tengan dependencias activas.
 - Asigna a un alumno como "Representante" de cada equipo.
-- Crea y gestiona las cuentas de usuario (matrícula + contraseña).
+- Crea y gestiona las cuentas de usuario (matrícula + contraseña) y puede retirar perfiles sin historial bloqueante.
 - Tiene acceso al panel de reportes, KPIs e informes.
 - Puede exportar reportes a CSV.
 
@@ -22,8 +22,8 @@
 
 | Método | Prioridad | Detalle |
 |---|---|---|
-| Matrícula + contraseña | Primario | El Admin crea la cuenta. El Representante usa su matrícula escolar como identificador. |
-| Google OAuth | Secundario / Futuro | Integración con cuentas institucionales `@cecyte.edu.mx`. Se configura con Supabase Auth + Google Cloud Console. |
+| Matrícula/correo + contraseña | Primario | El Admin crea la cuenta desde la app y define una contraseña inicial. |
+| Google OAuth | Secundario | Acceso con cuenta institucional existente; requiere Google Cloud Console + Supabase Auth configurados. |
 
 **Regla de seguridad**: Row Level Security (RLS) en Supabase garantiza que un Representante solo vea y modifique datos de su propio equipo. El middleware de Next.js redirige según el rol.
 
@@ -35,7 +35,7 @@
 - Un Representante pertenece a UN solo equipo.
 
 ### Gestión de Materiales
-- CRUD completo de materiales (solo Admin).
+- CRUD completo de materiales (solo Admin), con eliminación segura cuando no existan préstamos activos ni historial que deba conservarse.
 - Añadir stock: el Admin registra una entrada de material aumentando `cantidad_total`.
 - Registrar consumo: el Representante reporta que un material se consumió (ej. "se acabó el gas del soplete, 2 cilindros"). Esto descuenta del stock sin generar préstamo.
 - Estado visual del material: bueno, desgastado, dañado.
@@ -79,3 +79,13 @@ El sistema debe poder filtrar y exportar reportes de movimientos agrupados por:
 ### Actualización en Tiempo Real
 - Cuando un Representante pide o devuelve material, el inventario se actualiza en vivo para todos los usuarios conectados (vía Supabase Realtime).
 - El Dashboard del Admin refleja los cambios sin necesidad de refrescar la página.
+
+### Retroalimentación visual
+- Toda acción exitosa debe mostrar una confirmación visible para reducir incertidumbre del usuario.
+- Los formularios deben usar etiquetas explícitas, no depender solo de valores por defecto.
+- El login debe permitir mostrar/ocultar contraseña y no sugerir que ya hay texto escrito cuando el campo está vacío.
+
+### Gestión de Usuarios
+- El Admin puede crear usuarios desde la app con nombre, matrícula, correo, rol, equipo y contraseña inicial.
+- El Admin puede restablecer la contraseña de un usuario existente.
+- El sistema debe mostrar errores claros cuando ya existe una matrícula o correo.

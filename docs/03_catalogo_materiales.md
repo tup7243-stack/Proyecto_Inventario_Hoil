@@ -60,5 +60,6 @@
 - `cantidad_total` solo se modifica a través de movimientos (entrada_stock, consumo), nunca editando directamente el campo.
 
 ### Eliminar material (Admin)
-- Soft delete o solo permitir si no tiene préstamos activos.
-- Se registra en la bitácora de movimientos.
+- Si no tiene préstamos activos, se aplica eliminación lógica: deja de mostrarse en el catálogo operativo pero conserva su registro histórico.
+- Se crea un movimiento `eliminacion_material` para que el reporte muestre cuándo se eliminó y quién lo hizo.
+- Si tiene préstamos activos, la UI debe explicar por qué aún no se puede eliminar.

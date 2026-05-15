@@ -48,6 +48,8 @@ Vinculada 1:1 con `auth.users`. Extiende los datos del usuario.
 | `cantidad_total` | INTEGER | NOT NULL, DEFAULT 0, CHECK >= 0 | Stock físico total |
 | `stock_minimo` | INTEGER | NOT NULL, DEFAULT 0, CHECK >= 0 | Umbral para alerta |
 | `estado` | TEXT | NOT NULL, DEFAULT 'bueno', CHECK IN ('bueno', 'desgastado', 'dañado') | |
+| `activo` | BOOLEAN | NOT NULL, DEFAULT true | `false` cuando se elimina lógicamente |
+| `eliminado_at` | TIMESTAMPTZ | NULLABLE | Fecha de eliminación lógica |
 | `created_at` | TIMESTAMPTZ | DEFAULT now() | |
 | `updated_at` | TIMESTAMPTZ | DEFAULT now() | |
 

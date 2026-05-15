@@ -43,6 +43,9 @@ colors: {
   - Acción secundaria (cancelar, volver) → Gris
   - Acción destructiva (eliminar) → Rojo
 - **Iconos siempre acompañados de texto** hasta que el usuario se familiarice.
+- **Confirmación visible tras acciones:** mostrar estado de éxito después de guardar, actualizar, crear, devolver o eliminar.
+- **Campos autoexplicativos:** inputs numéricos deben mostrar etiqueta visible, por ejemplo `Cantidad inicial` y `Stock mínimo`, no solo valores `0` o `1`.
+- **Contraseña clara:** no usar placeholder de puntos cuando el campo está vacío y ofrecer control para mostrar/ocultar el valor.
 
 ### Iconografía (Lucide React)
 Usar iconos representativos de cada herramienta/material:
