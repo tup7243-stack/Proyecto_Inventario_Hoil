@@ -65,6 +65,7 @@ corepack pnpm exec playwright test --workers=1
 ## Notas locales importantes
 
 - En este entorno usa `pnpm` vía Corepack, no `npm`.
+- Para Supabase remoto usa preferentemente `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` y `SUPABASE_SECRET_KEY`; el código mantiene compatibilidad con las variables legacy locales `NEXT_PUBLIC_SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY`.
 - Si Next muestra `ECONNREFUSED 127.0.0.1:54321`, Supabase local no está disponible.
 - Si `supabase start` queda atorado como “already running”, suele resolverse con:
   ```bash

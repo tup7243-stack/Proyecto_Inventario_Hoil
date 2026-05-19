@@ -9,7 +9,7 @@ import { seedMateriales } from "./seed-data";
  *
  * Requiere las variables de entorno:
  * - NEXT_PUBLIC_SUPABASE_URL
- * - SUPABASE_SERVICE_ROLE_KEY (para crear usuarios y bypass RLS)
+ * - SUPABASE_SECRET_KEY o SUPABASE_SERVICE_ROLE_KEY (para crear usuarios y bypass RLS)
  *
  * Crea:
  * - 10 materiales iniciales (catálogo del taller de refrigeración)
@@ -18,11 +18,12 @@ import { seedMateriales } from "./seed-data";
  */
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const serviceRoleKey =
+  process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !serviceRoleKey) {
   console.error(
-    "ERROR: NEXT_PUBLIC_SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY son requeridas."
+    "ERROR: NEXT_PUBLIC_SUPABASE_URL y SUPABASE_SECRET_KEY/SUPABASE_SERVICE_ROLE_KEY son requeridas."
   );
   console.error("Asegurate de tener el archivo .env.local configurado.");
   process.exit(1);

@@ -11,10 +11,13 @@ import WebSocket from "ws";
  */
 export async function createClient() {
   const cookieStore = await cookies();
+  const publishableKey =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    publishableKey!,
     {
       cookies: {
         getAll() {
@@ -43,7 +46,9 @@ export async function createClient() {
  */
 export async function createAdminClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+  const serviceRoleKey =
+    process.env.SUPABASE_SECRET_KEY ??
+    process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
   return createSupabaseClient(supabaseUrl, serviceRoleKey, {
     auth: {
