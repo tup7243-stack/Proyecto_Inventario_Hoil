@@ -17,7 +17,9 @@ El código ya incluye el botón **Continuar con Google** y el callback `/auth/ca
 - El login llama a Google mediante Supabase OAuth y vuelve a `/auth/callback`.
 - Si el correo de Google coincide con una cuenta ya creada, Supabase puede vincular automáticamente esa identidad.
 - Si el usuario autenticado no tiene perfil en `public.perfiles`, la app cierra sesión y devuelve un mensaje de acceso no habilitado.
+- La pantalla de login muestra un aviso de **¿Necesitas una cuenta?** para aclarar que Google no asigna permisos por sí solo.
 
 ## Nota de operación
 
 Para que un usuario pueda entrar con Google, primero debe existir su cuenta/perfil en el sistema o debe quedar vinculado a una cuenta existente con el mismo correo institucional.
+La creación manual de usuarios se hace desde **Dashboard > Usuarios** por un administrador.

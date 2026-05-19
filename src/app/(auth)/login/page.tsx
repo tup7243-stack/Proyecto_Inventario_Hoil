@@ -4,7 +4,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff, Loader2, LogIn, Package } from "lucide-react";
+import { Eye, EyeOff, Loader2, LogIn, Package, UserPlus } from "lucide-react";
 
 /**
  * Login page — email/password authentication via Supabase Auth.
@@ -210,6 +210,18 @@ export default function LoginPage() {
             Continuar con Google
           </Button>
         </form>
+
+        <div className="rounded-lg border border-cecyte-primary/20 bg-cecyte-light/60 p-4 text-sm text-muted-foreground">
+          <div className="mb-1 flex items-center gap-2 font-medium text-foreground">
+            <UserPlus className="h-4 w-4 text-cecyte-primary" />
+            ¿Necesitas una cuenta?
+          </div>
+          <p>
+            Un administrador debe agregarte manualmente desde el módulo de{" "}
+            <strong>Usuarios</strong>. Iniciar con Google solo valida tu correo;
+            no crea permisos automáticamente si tu perfil no existe.
+          </p>
+        </div>
       </div>
     </div>
   );
