@@ -34,6 +34,8 @@
 | `cantidad_total` | INTEGER | Stock físico total en el taller |
 | `stock_minimo` | INTEGER | Umbral que dispara alerta de stock bajo |
 | `estado` | TEXT | `bueno`, `desgastado`, `dañado` |
+| `imagen_url` | TEXT | URL pública opcional de la imagen guía del material |
+| `imagen_path` | TEXT | Ruta del archivo en Supabase Storage para reemplazo/eliminación |
 | `created_at` | TIMESTAMPTZ | Fecha de creación del registro |
 | `updated_at` | TIMESTAMPTZ | Fecha de última modificación |
 
@@ -58,6 +60,13 @@
 ### Editar material (Admin)
 - El Admin puede modificar `nombre`, `categoria`, `stock_minimo` y `estado`.
 - `cantidad_total` solo se modifica a través de movimientos (entrada_stock, consumo), nunca editando directamente el campo.
+- La imagen guía se administra por separado para reducir ruido en la tarjeta del material.
+
+### Imagen guía (Admin)
+- Cada material puede tener una imagen opcional para ayudar a identificarlo visualmente.
+- Las imágenes se guardan en el bucket público `materiales` de Supabase Storage.
+- Solo admins pueden subir, reemplazar o quitar imágenes mediante Server Actions con clave server-side.
+- El catálogo muestra una miniatura; si no hay imagen, muestra un marcador visual "Sin imagen".
 
 ### Eliminar material (Admin)
 - Si no tiene préstamos activos, se aplica eliminación lógica: deja de mostrarse en el catálogo operativo pero conserva su registro histórico.

@@ -40,6 +40,56 @@ function getPassword(formData: FormData, key: string) {
   return value;
 }
 
+function getImageFile(formData: FormData) {
+  const value = formData.get("imagen");
+  if (!(value instanceof File) || value.size === 0) return null;
+
+  if (!value.type.startsWith("image/")) {
+    throw new Error("Solo puedes subir archivos de imagen.");
+  }
+
+  const maxSize = 5 * 1024 * 1024;
+  if (value.size > maxSize) {
+    throw new Error("La imagen no puede pesar más de 5 MB.");
+  }
+
+  return value;
+}
+
+function imageExtension(file: File) {
+  const byType: Record<string, string> = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+    "image/gif": "gif",
+  };
+
+  if (byType[file.type]) return byType[file.type];
+
+  const original = file.name.split(".").pop()?.toLowerCase();
+  return original?.replace(/[^a-z0-9]/g, "") || "jpg";
+}
+
+async function uploadMaterialImage(
+  supabase: Awaited<ReturnType<typeof createAdminClient>>,
+  materialId: string,
+  file: File
+) {
+  const path = `${materialId}/${Date.now()}.${imageExtension(file)}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("materiales")
+    .upload(path, file, {
+      contentType: file.type,
+      upsert: false,
+    });
+
+  if (uploadError) throw new Error(uploadError.message);
+
+  const { data } = supabase.storage.from("materiales").getPublicUrl(path);
+  return { path, url: data.publicUrl };
+}
+
 async function requireAdmin() {
   const supabase = await createClient();
   const {
@@ -70,6 +120,7 @@ export async function createMaterial(formData: FormData) {
   const estado = getString(formData, "estado") as MaterialEstado;
   const cantidad = getNonNegativeInt(formData, "cantidad_total");
   const stockMinimo = getNonNegativeInt(formData, "stock_minimo");
+  const imageFile = getImageFile(formData);
 
   if (!nombre) throw new Error("El nombre es requerido.");
 
@@ -87,6 +138,16 @@ export async function createMaterial(formData: FormData) {
 
   if (error) throw new Error(error.message);
 
+  if (imageFile) {
+    const image = await uploadMaterialImage(supabase, material.id, imageFile);
+    const { error: imageError } = await supabase
+      .from("materiales")
+      .update({ imagen_url: image.url, imagen_path: image.path })
+      .eq("id", material.id);
+
+    if (imageError) throw new Error(imageError.message);
+  }
+
   if (cantidad > 0) {
     const { error: movimientoError } = await supabase
       .from("movimientos")
@@ -99,6 +160,77 @@ export async function createMaterial(formData: FormData) {
       });
 
     if (movimientoError) throw new Error(movimientoError.message);
+  }
+
+  revalidatePath("/dashboard/materiales");
+  revalidatePath("/dashboard");
+}
+
+export async function updateMaterialImage(formData: FormData) {
+  await requireAdmin();
+  const supabase = await createAdminClient();
+
+  const id = getString(formData, "id");
+  const imageFile = getImageFile(formData);
+
+  if (!id) throw new Error("Material inválido.");
+  if (!imageFile) throw new Error("Selecciona una imagen.");
+
+  const { data: material, error: materialError } = await supabase
+    .from("materiales")
+    .select("imagen_path")
+    .eq("id", id)
+    .eq("activo", true)
+    .single();
+
+  if (materialError || !material) {
+    throw new Error(materialError?.message ?? "Material no encontrado.");
+  }
+
+  const image = await uploadMaterialImage(supabase, id, imageFile);
+
+  const { error: updateError } = await supabase
+    .from("materiales")
+    .update({ imagen_url: image.url, imagen_path: image.path })
+    .eq("id", id);
+
+  if (updateError) throw new Error(updateError.message);
+
+  if (material.imagen_path) {
+    await supabase.storage.from("materiales").remove([material.imagen_path]);
+  }
+
+  revalidatePath("/dashboard/materiales");
+  revalidatePath("/dashboard");
+}
+
+export async function deleteMaterialImage(formData: FormData) {
+  await requireAdmin();
+  const supabase = await createAdminClient();
+  const id = getString(formData, "id");
+
+  if (!id) throw new Error("Material inválido.");
+
+  const { data: material, error: materialError } = await supabase
+    .from("materiales")
+    .select("imagen_path")
+    .eq("id", id)
+    .eq("activo", true)
+    .single();
+
+  if (materialError || !material) {
+    throw new Error(materialError?.message ?? "Material no encontrado.");
+  }
+
+  const { error: updateError } = await supabase
+    .from("materiales")
+    .update({ imagen_url: null, imagen_path: null })
+    .eq("id", id);
+
+  if (updateError) throw new Error(updateError.message);
+
+  if (material.imagen_path) {
+    await supabase.storage.from("materiales").remove([material.imagen_path]);
   }
 
   revalidatePath("/dashboard/materiales");

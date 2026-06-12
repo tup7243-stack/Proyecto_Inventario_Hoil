@@ -65,6 +65,8 @@ export const materiales = pgTable(
     estado: text("estado", { enum: ["bueno", "desgastado", "dañado"] })
       .notNull()
       .default("bueno"),
+    imagenUrl: text("imagen_url"),
+    imagenPath: text("imagen_path"),
     activo: boolean("activo").notNull().default(true),
     eliminadoAt: timestamp("eliminado_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
