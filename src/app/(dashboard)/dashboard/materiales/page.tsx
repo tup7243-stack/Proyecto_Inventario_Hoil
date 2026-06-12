@@ -238,8 +238,8 @@ export default async function MaterialesPage() {
                 </div>
               </div>
 
-              <div className="grid gap-3 border-t bg-muted/20 p-4 md:grid-cols-3">
-                <details className="rounded-lg border bg-background p-3 md:col-span-2">
+              <div className="grid gap-3 border-t bg-muted/20 p-4 lg:grid-cols-[minmax(0,1fr)_240px]">
+                <details className="min-w-0 rounded-lg border bg-background p-3 lg:col-start-1 lg:row-start-1">
                   <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-medium">
                     <Pencil className="h-4 w-4 text-cecyte-primary" />
                     Editar datos
@@ -278,7 +278,7 @@ export default async function MaterialesPage() {
                   </ManagedForm>
                 </details>
 
-                <details className="rounded-lg border bg-background p-3">
+                <details className="min-w-0 rounded-lg border bg-background p-3 lg:col-start-2 lg:row-start-1">
                   <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-medium">
                     <PackagePlus className="h-4 w-4 text-cecyte-primary" />
                     Entrada
@@ -307,7 +307,7 @@ export default async function MaterialesPage() {
                   </ManagedForm>
                 </details>
 
-                <details className="rounded-lg border bg-background p-3 md:col-span-2">
+                <details className="min-w-0 rounded-lg border bg-background p-3 lg:col-start-1 lg:row-start-2">
                   <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-medium">
                     <UploadCloud className="h-4 w-4 text-cecyte-primary" />
                     Imagen guía
@@ -315,7 +315,7 @@ export default async function MaterialesPage() {
                   <ManagedForm
                     action={updateMaterialImage}
                     successMessage="Imagen actualizada."
-                    className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto]"
+                    className="mt-3 grid gap-2"
                   >
                     <input type="hidden" name="id" value={material.id} />
                     <input
@@ -323,7 +323,7 @@ export default async function MaterialesPage() {
                       type="file"
                       accept="image/png,image/jpeg,image/webp,image/gif"
                       required
-                      className="rounded-md border px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-cecyte-light file:px-3 file:py-1 file:text-xs file:font-medium file:text-cecyte-primary"
+                      className="min-w-0 rounded-md border px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-cecyte-light file:px-3 file:py-1 file:text-xs file:font-medium file:text-cecyte-primary"
                     />
                     <button className="rounded-md border px-4 py-2 text-sm font-medium hover:bg-muted">
                       Subir
@@ -348,7 +348,7 @@ export default async function MaterialesPage() {
                   action={deleteMaterial}
                   successMessage="Material eliminado."
                   confirmMessage={`¿Eliminar "${material.nombre}"? Se ocultará del catálogo y quedará registro en reportes.`}
-                  className="rounded-lg border border-red-100 bg-red-50 p-3"
+                  className="self-start rounded-lg border border-red-100 bg-red-50 p-3 lg:col-start-2 lg:row-start-2"
                 >
                   <input type="hidden" name="id" value={material.id} />
                   <button className="flex w-full items-center justify-center gap-2 rounded-md border border-red-200 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-100">
