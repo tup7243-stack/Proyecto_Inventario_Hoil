@@ -1,5 +1,6 @@
 import { FileText } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { getSearchParam, matchesSearch } from "@/lib/search";
 
 interface MovimientoRow {
   id: string;
@@ -43,7 +44,7 @@ function clampDateRange(desdeParam?: string, hastaParam?: string) {
 export default async function ReportesPage({
   searchParams,
 }: {
-  searchParams: { desde?: string; hasta?: string; tipo?: string };
+  searchParams: { desde?: string; hasta?: string; tipo?: string; q?: string | string[] };
 }) {
   const supabase = await createClient();
   const { desde, hasta, desdeValue, hastaValue } = clampDateRange(
@@ -51,6 +52,7 @@ export default async function ReportesPage({
     searchParams.hasta
   );
   const tipo = searchParams.tipo ?? "todos";
+  const search = getSearchParam(searchParams);
 
   let query = supabase
     .from("movimientos")
@@ -66,7 +68,19 @@ export default async function ReportesPage({
   }
 
   const { data: movimientos } = await query;
-  const rows = (movimientos ?? []) as unknown as MovimientoRow[];
+  const allRows = (movimientos ?? []) as unknown as MovimientoRow[];
+  const rows = allRows.filter((row) =>
+    matchesSearch(search, [
+      tipoLabels[row.tipo] ?? row.tipo,
+      row.tipo,
+      relatedName(row.material),
+      relatedName(row.equipo),
+      relatedName(row.usuario),
+      row.comentario,
+      row.cantidad,
+      new Date(row.created_at).toLocaleDateString("es-MX"),
+    ])
+  );
 
   const resumen = rows.reduce<Record<string, number>>((acc, row) => {
     acc[row.tipo] = (acc[row.tipo] ?? 0) + row.cantidad;
@@ -83,7 +97,7 @@ export default async function ReportesPage({
       </div>
 
       <section className="rounded-lg border bg-card p-4 shadow-sm">
-        <form className="grid gap-3 md:grid-cols-5">
+        <form className="grid gap-3 md:grid-cols-6">
           <label className="grid gap-1 text-sm">
             <span className="text-xs font-medium text-muted-foreground">Desde</span>
             <input name="desde" type="date" defaultValue={desdeValue} className="rounded-md border px-3 py-2" />
@@ -103,9 +117,28 @@ export default async function ReportesPage({
               <option value="eliminacion_material">Materiales eliminados</option>
             </select>
           </label>
-          <button className="self-end rounded-md bg-cecyte-primary px-4 py-2 text-sm font-medium text-white hover:bg-cecyte-dark">
-            Filtrar
-          </button>
+          <label className="grid gap-1 text-sm md:col-span-5">
+            <span className="text-xs font-medium text-muted-foreground">Buscar</span>
+            <input
+              name="q"
+              defaultValue={search}
+              placeholder="Material, usuario, equipo o comentario..."
+              className="rounded-md border px-3 py-2"
+            />
+          </label>
+          <div className="flex items-end gap-2">
+            <button className="flex-1 rounded-md bg-cecyte-primary px-4 py-2 text-sm font-medium text-white hover:bg-cecyte-dark">
+              Filtrar
+            </button>
+            {search && (
+              <a
+                href={`/dashboard/reportes?desde=${desdeValue}&hasta=${hastaValue}&tipo=${tipo}`}
+                className="rounded-md border px-3 py-2 text-sm font-medium hover:bg-muted"
+              >
+                Limpiar
+              </a>
+            )}
+          </div>
         </form>
       </section>
 
@@ -123,8 +156,11 @@ export default async function ReportesPage({
           <FileText className="h-5 w-5 text-cecyte-primary" />
           <h2 className="font-semibold">Movimientos</h2>
         </div>
+        <p className="mb-3 text-xs text-muted-foreground">
+          {search ? `${rows.length} de ${allRows.length} movimientos encontrados` : `${rows.length} movimientos encontrados`}
+        </p>
         {rows.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No hay movimientos en este rango.</p>
+          <p className="text-sm text-muted-foreground">No hay movimientos con esos filtros.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">

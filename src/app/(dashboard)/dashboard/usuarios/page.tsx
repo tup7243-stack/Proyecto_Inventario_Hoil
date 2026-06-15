@@ -5,7 +5,9 @@ import {
   updatePerfil,
 } from "@/lib/actions/admin";
 import { ManagedForm } from "@/components/forms/managed-form";
+import { SearchBox } from "@/components/search-box";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
+import { getSearchParam, matchesSearch } from "@/lib/search";
 
 interface EquipoRow {
   id: string;
@@ -26,7 +28,12 @@ function relatedName(value: { nombre: string } | { nombre: string }[] | null) {
   return value?.nombre;
 }
 
-export default async function UsuariosPage() {
+export default async function UsuariosPage({
+  searchParams,
+}: {
+  searchParams?: { q?: string | string[] };
+}) {
+  const search = getSearchParam(searchParams);
   const supabase = await createClient();
   const adminSupabase = await createAdminClient();
   const [{ data: perfiles }, { data: equipos }, { data: authUsers }] = await Promise.all([
@@ -39,6 +46,17 @@ export default async function UsuariosPage() {
   ]);
   const emailByUserId = new Map(
     (authUsers?.users ?? []).map((user) => [user.id, user.email ?? "Sin correo"])
+  );
+  const allPerfiles = (perfiles ?? []) as unknown as PerfilRow[];
+  const filteredPerfiles = allPerfiles.filter((perfil) =>
+    matchesSearch(search, [
+      perfil.nombre,
+      perfil.matricula,
+      perfil.rol,
+      perfil.rol === "admin" ? "administrador" : "representante",
+      emailByUserId.get(perfil.id),
+      relatedName(perfil.equipo),
+    ])
   );
 
   return (
@@ -101,8 +119,16 @@ export default async function UsuariosPage() {
         </ManagedForm>
       </section>
 
+      <SearchBox
+        value={search}
+        placeholder="Buscar usuario, correo, matrícula, rol o equipo..."
+        total={allPerfiles.length}
+        filtered={filteredPerfiles.length}
+        clearHref="/dashboard/usuarios"
+      />
+
       <section className="grid gap-4">
-        {((perfiles ?? []) as unknown as PerfilRow[]).map((perfil) => (
+        {filteredPerfiles.map((perfil) => (
           <article key={perfil.id} className="rounded-lg border bg-card p-4 shadow-sm">
             <ManagedForm
               action={updatePerfil}
@@ -169,6 +195,11 @@ export default async function UsuariosPage() {
             </ManagedForm>
           </article>
         ))}
+        {filteredPerfiles.length === 0 && (
+          <div className="rounded-lg border bg-card p-6 text-sm text-muted-foreground shadow-sm">
+            No encontramos usuarios con ese texto.
+          </div>
+        )}
       </section>
     </div>
   );

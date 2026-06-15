@@ -15,8 +15,10 @@ import {
   updateMaterialImage,
 } from "@/lib/actions/admin";
 import { ManagedForm } from "@/components/forms/managed-form";
+import { SearchBox } from "@/components/search-box";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
+import { getSearchParam, matchesSearch } from "@/lib/search";
 
 const categorias = [
   ["herramienta_manual", "Herramienta manual"],
@@ -74,7 +76,12 @@ function MaterialImage({ material }: { material: MaterialRow }) {
   );
 }
 
-export default async function MaterialesPage() {
+export default async function MaterialesPage({
+  searchParams,
+}: {
+  searchParams?: { q?: string | string[] };
+}) {
+  const search = getSearchParam(searchParams);
   const supabase = await createClient();
   const [{ data: materiales }, { data: prestamos }] = await Promise.all([
     supabase
@@ -98,6 +105,17 @@ export default async function MaterialesPage() {
     );
   }
 
+  const allMaterials = (materiales ?? []) as MaterialRow[];
+  const filteredMaterials = allMaterials.filter((material) =>
+    matchesSearch(search, [
+      material.nombre,
+      material.categoria,
+      labelFor(categoriaLabel, material.categoria),
+      material.estado,
+      labelFor(estadoLabel, material.estado),
+    ])
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -108,7 +126,7 @@ export default async function MaterialesPage() {
           </p>
         </div>
         <p className="rounded-full bg-cecyte-light px-3 py-1 text-xs font-medium text-cecyte-primary">
-          {(materiales ?? []).length} materiales activos
+          {filteredMaterials.length} materiales activos
         </p>
       </div>
 
@@ -186,8 +204,16 @@ export default async function MaterialesPage() {
         </div>
       </details>
 
+      <SearchBox
+        value={search}
+        placeholder="Buscar por nombre, categoría o estado..."
+        total={allMaterials.length}
+        filtered={filteredMaterials.length}
+        clearHref="/dashboard/materiales"
+      />
+
       <section className="grid gap-4 xl:grid-cols-2">
-        {((materiales ?? []) as MaterialRow[]).map((material) => {
+        {filteredMaterials.map((material) => {
           const prestado = prestadoPorMaterial.get(material.id) ?? 0;
           const disponible = Math.max(0, material.cantidad_total - prestado);
           const bajo = disponible <= material.stock_minimo;
@@ -360,6 +386,11 @@ export default async function MaterialesPage() {
             </article>
           );
         })}
+        {filteredMaterials.length === 0 && (
+          <div className="rounded-xl border bg-card p-6 text-sm text-muted-foreground shadow-sm xl:col-span-2">
+            No encontramos materiales con ese texto.
+          </div>
+        )}
       </section>
     </div>
   );

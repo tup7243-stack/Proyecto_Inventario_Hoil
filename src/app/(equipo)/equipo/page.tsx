@@ -5,7 +5,9 @@ import {
   pedirMaterial,
 } from "@/lib/actions/prestamos";
 import { ManagedForm } from "@/components/forms/managed-form";
+import { SearchBox } from "@/components/search-box";
 import { createClient } from "@/lib/supabase/server";
+import { getSearchParam, matchesSearch } from "@/lib/search";
 
 interface MaterialRow {
   id: string;
@@ -48,7 +50,12 @@ function categoryLabel(value: string) {
   return labels[value] ?? value;
 }
 
-export default async function EquipoPage() {
+export default async function EquipoPage({
+  searchParams,
+}: {
+  searchParams?: { q?: string | string[] };
+}) {
+  const search = getSearchParam(searchParams);
   const supabase = await createClient();
   const {
     data: { user },
@@ -97,6 +104,27 @@ export default async function EquipoPage() {
   });
 
   const prestamos = (prestamosActivos ?? []) as unknown as PrestamoActivoRow[];
+  const filteredPrestamos = prestamos.filter((prestamo) =>
+    matchesSearch(search, [
+      relatedMaterialName(prestamo.material),
+      Array.isArray(prestamo.material)
+        ? prestamo.material[0]?.categoria
+        : prestamo.material?.categoria,
+      categoryLabel(
+        Array.isArray(prestamo.material)
+          ? prestamo.material[0]?.categoria ?? ""
+          : prestamo.material?.categoria ?? ""
+      ),
+    ])
+  );
+  const filteredMateriales = materialesConDisponible.filter((material) =>
+    matchesSearch(search, [
+      material.nombre,
+      material.categoria,
+      categoryLabel(material.categoria),
+      material.estado,
+    ])
+  );
 
   return (
     <div className="space-y-6">
@@ -119,19 +147,27 @@ export default async function EquipoPage() {
         </div>
       </section>
 
+      <SearchBox
+        value={search}
+        placeholder="Buscar material por nombre, categoría o estado..."
+        total={materialesConDisponible.length + prestamos.length}
+        filtered={filteredMateriales.length + filteredPrestamos.length}
+        clearHref="/equipo"
+      />
+
       <section id="prestamos" className="space-y-3">
         <div className="flex items-center gap-2">
           <RefreshCw className="h-5 w-5 text-cecyte-primary" />
           <h2 className="text-lg font-bold">Mis préstamos activos</h2>
         </div>
 
-        {prestamos.length === 0 ? (
+        {filteredPrestamos.length === 0 ? (
           <div className="rounded-xl bg-white p-4 text-sm text-muted-foreground shadow-sm">
-            No tienes préstamos activos por devolver.
+            {search ? "No encontramos préstamos activos con ese texto." : "No tienes préstamos activos por devolver."}
           </div>
         ) : (
           <div className="grid gap-3">
-            {prestamos.map((prestamo) => {
+            {filteredPrestamos.map((prestamo) => {
               const pendiente = prestamo.cantidad_prestada - (prestamo.cantidad_devuelta ?? 0);
               return (
                 <article key={prestamo.id} className="rounded-xl bg-white p-4 shadow-sm">
@@ -183,7 +219,7 @@ export default async function EquipoPage() {
         </div>
 
         <div className="grid gap-3 md:grid-cols-2">
-          {materialesConDisponible.map((material) => {
+          {filteredMateriales.map((material) => {
             const agotado = material.disponible <= 0;
             const bajo = material.disponible <= material.stock_minimo;
             return (
@@ -258,6 +294,11 @@ export default async function EquipoPage() {
               </article>
             );
           })}
+          {filteredMateriales.length === 0 && (
+            <div className="rounded-xl bg-white p-4 text-sm text-muted-foreground shadow-sm md:col-span-2">
+              No encontramos materiales con ese texto.
+            </div>
+          )}
         </div>
       </section>
     </div>

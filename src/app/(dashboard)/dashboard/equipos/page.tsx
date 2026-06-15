@@ -1,6 +1,8 @@
 import { createEquipo, deleteEquipo, updateEquipo } from "@/lib/actions/admin";
 import { ManagedForm } from "@/components/forms/managed-form";
+import { SearchBox } from "@/components/search-box";
 import { createClient } from "@/lib/supabase/server";
+import { getSearchParam, matchesSearch } from "@/lib/search";
 
 interface EquipoRow {
   id: string;
@@ -9,12 +11,28 @@ interface EquipoRow {
   prestamos: { id: string; estado: string }[] | null;
 }
 
-export default async function EquiposPage() {
+export default async function EquiposPage({
+  searchParams,
+}: {
+  searchParams?: { q?: string | string[] };
+}) {
+  const search = getSearchParam(searchParams);
   const supabase = await createClient();
   const { data: equipos } = await supabase
     .from("equipos")
     .select("id, nombre, perfiles(id, nombre, matricula), prestamos(id, estado)")
     .order("nombre");
+
+  const allEquipos = (equipos ?? []) as EquipoRow[];
+  const filteredEquipos = allEquipos.filter((equipo) =>
+    matchesSearch(search, [
+      equipo.nombre,
+      ...(equipo.perfiles ?? []).flatMap((perfil) => [
+        perfil.nombre,
+        perfil.matricula,
+      ]),
+    ])
+  );
 
   return (
     <div className="space-y-6">
@@ -45,8 +63,16 @@ export default async function EquiposPage() {
         </ManagedForm>
       </section>
 
+      <SearchBox
+        value={search}
+        placeholder="Buscar equipo, representante o matrícula..."
+        total={allEquipos.length}
+        filtered={filteredEquipos.length}
+        clearHref="/dashboard/equipos"
+      />
+
       <section className="grid gap-4 md:grid-cols-2">
-        {((equipos ?? []) as EquipoRow[]).map((equipo) => {
+        {filteredEquipos.map((equipo) => {
           const prestamosActivos = (equipo.prestamos ?? []).filter(
             (prestamo) => prestamo.estado === "activo"
           ).length;
@@ -106,6 +132,11 @@ export default async function EquiposPage() {
             </article>
           );
         })}
+        {filteredEquipos.length === 0 && (
+          <div className="rounded-lg border bg-card p-6 text-sm text-muted-foreground shadow-sm md:col-span-2">
+            No encontramos equipos con ese texto.
+          </div>
+        )}
       </section>
     </div>
   );
