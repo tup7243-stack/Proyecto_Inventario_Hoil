@@ -150,54 +150,54 @@ export default async function MaterialesPage({
             action={createMaterial}
             successMessage="Material guardado correctamente."
             resetOnSuccess
-            className="grid gap-3 md:grid-cols-6"
+            className="grid gap-4 md:grid-cols-2 xl:grid-cols-12"
           >
             <input
               name="nombre"
               placeholder="Nombre del material"
               required
-              className="rounded-md border px-3 py-2 text-sm md:col-span-2"
+              className="h-12 min-w-0 rounded-md border px-3 py-2 text-sm md:col-span-2 xl:col-span-4"
             />
-            <select name="categoria" className="rounded-md border px-3 py-2 text-sm">
+            <select name="categoria" className="h-12 min-w-0 rounded-md border px-3 py-2 text-sm xl:col-span-2">
               {categorias.map(([value, label]) => (
                 <option key={value} value={value}>{label}</option>
               ))}
             </select>
-            <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+            <label className="grid min-w-0 gap-2 text-xs font-medium text-muted-foreground xl:col-span-2">
               Cantidad inicial
               <input
                 name="cantidad_total"
                 type="number"
                 min="0"
                 defaultValue="0"
-                className="rounded-md border px-3 py-2 text-sm text-foreground"
+                className="h-12 min-w-0 rounded-md border px-3 py-2 text-sm text-foreground"
               />
             </label>
-            <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+            <label className="grid min-w-0 gap-2 text-xs font-medium text-muted-foreground xl:col-span-2">
               Stock mínimo
               <input
                 name="stock_minimo"
                 type="number"
                 min="0"
                 defaultValue="1"
-                className="rounded-md border px-3 py-2 text-sm text-foreground"
+                className="h-12 min-w-0 rounded-md border px-3 py-2 text-sm text-foreground"
               />
             </label>
-            <select name="estado" className="rounded-md border px-3 py-2 text-sm">
+            <select name="estado" className="h-12 min-w-0 self-end rounded-md border px-3 py-2 text-sm xl:col-span-2">
               {estados.map(([value, label]) => (
                 <option key={value} value={value}>{label}</option>
               ))}
             </select>
-            <label className="grid gap-1 text-xs font-medium text-muted-foreground md:col-span-3">
+            <label className="grid min-w-0 gap-2 text-xs font-medium text-muted-foreground md:col-span-2 xl:col-span-6">
               Imagen guía opcional
               <input
                 name="imagen"
                 type="file"
                 accept="image/png,image/jpeg,image/webp,image/gif"
-                className="rounded-md border px-3 py-2 text-sm text-foreground file:mr-3 file:rounded-md file:border-0 file:bg-cecyte-light file:px-3 file:py-1 file:text-xs file:font-medium file:text-cecyte-primary"
+                className="min-w-0 rounded-md border px-3 py-2 text-sm text-foreground file:mr-3 file:rounded-md file:border-0 file:bg-cecyte-light file:px-3 file:py-1 file:text-xs file:font-medium file:text-cecyte-primary"
               />
             </label>
-            <button className="rounded-md bg-cecyte-primary px-4 py-2 text-sm font-medium text-white hover:bg-cecyte-dark md:col-span-3 md:self-end">
+            <button className="h-12 rounded-md bg-cecyte-primary px-4 py-2 text-sm font-medium text-white hover:bg-cecyte-dark md:col-span-2 md:self-end xl:col-span-6">
               Guardar material
             </button>
           </ManagedForm>
