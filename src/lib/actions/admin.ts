@@ -5,6 +5,7 @@ import { createAdminClient, createClient } from "@/lib/supabase/server";
 import {
   calcularDisponible,
   validarCantidadDisponible,
+  validarDevolucionPendiente,
 } from "@/lib/domain/inventory";
 
 export type MaterialCategoria =
@@ -458,6 +459,70 @@ export async function createEquipoPrestamo(formData: FormData) {
     .eq("id", prestamo.id);
 
   if (updateError) throw new Error(updateError.message);
+
+  revalidatePath("/dashboard/equipos");
+  revalidatePath("/dashboard/materiales");
+  revalidatePath("/dashboard");
+  revalidatePath("/equipo");
+}
+
+export async function devolverPrestamo(formData: FormData) {
+  const adminId = await requireAdmin();
+  const supabase = await createAdminClient();
+
+  const prestamoId = getString(formData, "prestamo_id");
+  const equipoId = getString(formData, "equipo_id");
+  const cantidad = getPositiveInt(formData, "cantidad");
+  const comentario =
+    getString(formData, "comentario") || "Devolución registrada por administrador";
+
+  const { data: prestamo, error } = await supabase
+    .from("prestamos")
+    .select("id, equipo_id, material_id, cantidad_prestada, cantidad_devuelta, estado")
+    .eq("id", prestamoId)
+    .eq("equipo_id", equipoId)
+    .single();
+
+  if (error || !prestamo) {
+    throw new Error("Préstamo no encontrado o no pertenece a este equipo.");
+  }
+
+  if (prestamo.estado !== "activo") {
+    throw new Error("Este préstamo ya fue devuelto.");
+  }
+
+  const validationError = validarDevolucionPendiente(
+    cantidad,
+    prestamo.cantidad_prestada,
+    prestamo.cantidad_devuelta,
+  );
+
+  if (validationError) throw new Error(validationError);
+
+  const nuevaCantidadDevuelta = prestamo.cantidad_devuelta + cantidad;
+  const nuevoEstado =
+    nuevaCantidadDevuelta >= prestamo.cantidad_prestada ? "devuelto" : "activo";
+
+  const { error: updateError } = await supabase
+    .from("prestamos")
+    .update({ cantidad_devuelta: nuevaCantidadDevuelta, estado: nuevoEstado })
+    .eq("id", prestamoId);
+
+  if (updateError) throw new Error(updateError.message);
+
+  const { error: movimientoError } = await supabase
+    .from("movimientos")
+    .insert({
+      tipo: "entrada_devolucion",
+      material_id: prestamo.material_id,
+      cantidad,
+      equipo_id: equipoId,
+      usuario_id: adminId,
+      prestamo_id: prestamoId,
+      comentario,
+    });
+
+  if (movimientoError) throw new Error(movimientoError.message);
 
   revalidatePath("/dashboard/equipos");
   revalidatePath("/dashboard/materiales");

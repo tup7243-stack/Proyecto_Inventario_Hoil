@@ -1,14 +1,24 @@
-import { createEquipo, createEquipoPrestamo, deleteEquipo, updateEquipo } from "@/lib/actions/admin";
+import { createEquipo, createEquipoPrestamo, deleteEquipo, devolverPrestamo, updateEquipo } from "@/lib/actions/admin";
 import { ManagedForm } from "@/components/forms/managed-form";
 import { SearchBox } from "@/components/search-box";
 import { createClient } from "@/lib/supabase/server";
 import { getSearchParam, matchesSearch } from "@/lib/search";
 
+interface EquipoPrestamoRow {
+  id: string;
+  estado: string;
+  cantidad_prestada: number;
+  cantidad_devuelta: number;
+  material_id: string;
+  representante_id: string;
+  equipo_id: string;
+}
+
 interface EquipoRow {
   id: string;
   nombre: string;
   perfiles: { id: string; nombre: string; matricula: string; rol: string }[] | null;
-  prestamos: { id: string; estado: string }[] | null;
+  prestamos: EquipoPrestamoRow[] | null;
 }
 
 interface MaterialRow {
@@ -37,7 +47,7 @@ export default async function EquiposPage({
   ] = await Promise.all([
     supabase
       .from("equipos")
-      .select("id, nombre, perfiles(id, nombre, matricula, rol), prestamos(id, estado)")
+      .select("id, nombre, perfiles(id, nombre, matricula, rol), prestamos(id, estado, cantidad_prestada, cantidad_devuelta, material_id, representante_id, equipo_id)")
       .order("nombre"),
     supabase
       .from("materiales")
@@ -125,7 +135,8 @@ export default async function EquiposPage({
             materialesConDisponible.some((material) => material.disponible > 0);
           const prestamosActivos = (equipo.prestamos ?? []).filter(
             (prestamo) => prestamo.estado === "activo"
-          ).length;
+          );
+          const prestamosActivosCount = prestamosActivos.length;
 
           return (
             <article key={equipo.id} className="rounded-lg border bg-card p-4 shadow-sm">
@@ -152,7 +163,7 @@ export default async function EquiposPage({
                 </div>
                 <div className="rounded-md bg-muted p-3">
                   <p className="text-xs text-muted-foreground">Préstamos activos</p>
-                  <p className="font-semibold">{prestamosActivos}</p>
+                  <p className="font-semibold">{prestamosActivosCount}</p>
                 </div>
               </div>
 
@@ -232,6 +243,60 @@ export default async function EquiposPage({
                   </p>
                 )}
               </div>
+
+              {prestamosActivos.length > 0 && (
+                <div className="mt-4 border-t pt-4">
+                  <h3 className="mb-2 text-sm font-medium">Préstamos activos</h3>
+                  <div className="space-y-2">
+                    {prestamosActivos.map((prestamo) => {
+                      const material = allMaterials.find((m) => m.id === prestamo.material_id);
+                      const representante = representantes.find(
+                        (p) => p.id === prestamo.representante_id,
+                      );
+                      const pendiente = prestamo.cantidad_prestada - prestamo.cantidad_devuelta;
+
+                      return (
+                        <div
+                          key={prestamo.id}
+                          className="rounded-md border px-3 py-2 text-sm"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0">
+                              <p className="truncate font-medium">
+                                {material?.nombre ?? "Material desconocido"}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                Pendiente: {pendiente} · {representante?.nombre ?? "—"}
+                              </p>
+                            </div>
+                            <ManagedForm
+                              action={devolverPrestamo}
+                              successMessage="Devolución registrada correctamente."
+                              resetOnSuccess
+                              className="flex shrink-0 items-center gap-1"
+                            >
+                              <input type="hidden" name="prestamo_id" value={prestamo.id} />
+                              <input type="hidden" name="equipo_id" value={equipo.id} />
+                              <input
+                                name="cantidad"
+                                type="number"
+                                min="1"
+                                max={pendiente}
+                                defaultValue={pendiente}
+                                required
+                                className="w-14 rounded-md border px-2 py-1 text-xs"
+                              />
+                              <button className="rounded-md bg-green-600 px-2 py-1 text-xs font-medium text-white hover:bg-green-700">
+                                Devolver
+                              </button>
+                            </ManagedForm>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               <ManagedForm
                 action={deleteEquipo}
