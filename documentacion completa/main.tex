@@ -1,0 +1,1408 @@
+% !TEX program = pdfLaTeX
+\documentclass[12pt,a4paper,oneside]{report}
+
+% -- Encoding & Fonts --------------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+
+% -- Language ----------------------------------------------
+\usepackage[spanish,es-nodecimaldot]{babel}
+
+% -- Page geometry -----------------------------------------
+\usepackage[a4paper,margin=2.5cm,headheight=25pt]{geometry}
+
+% -- Spacing -----------------------------------------------
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{parskip}
+
+% -- Colors ------------------------------------------------
+\usepackage[table,dvipsnames]{xcolor}
+\definecolor{cecyteGreen}{HTML}{006341}
+\definecolor{cecyteDark}{HTML}{004d35}
+\definecolor{cecyteLight}{HTML}{e6f0ec}
+\definecolor{cecyteOrange}{HTML}{F97316}
+\definecolor{cecyteAccent}{HTML}{D4A017}
+\definecolor{codebg}{HTML}{f4f4f4}
+
+% -- Graphics & figures ------------------------------------
+\usepackage{graphicx}
+\usepackage{float}
+
+% -- Math --------------------------------------------------
+\usepackage{amsmath}
+
+% -- Tables ------------------------------------------------
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{colortbl}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+% -- Code listings -----------------------------------------
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  backgroundcolor=\color{codebg},
+  frame=single,
+  framerule=0.5pt,
+  rulecolor=\color{cecyteGreen!30},
+  breaklines=true,
+  postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+  columns=flexible,
+  aboveskip=8pt,
+  belowskip=8pt,
+}
+\lstdefinestyle{inline}{
+  basicstyle=\ttfamily\small\color{cecyteDark},
+  backgroundcolor={},
+  frame=none,
+}
+\newcommand{\file}[1]{\texttt{\color{cecyteDark}#1}}
+\newcommand{\pkg}[1]{\texttt{#1}}
+
+% -- Chapter & section styling -----------------------------
+\usepackage{titlesec}
+\usepackage{titletoc}
+
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries\color{cecyteGreen}}
+  {\filleft\fontsize{60}{60}\selectfont\color{cecyteGreen!30}\thechapter}
+  {0pt}
+  {\filleft\Huge}
+  [\vspace{-8pt}\textcolor{cecyteGreen}{\rule{\textwidth}{2pt}}]
+
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{cecyteDark}}
+  {\thesection}{1em}{}
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\color{cecyteGreen}}
+  {\thesubsection}{1em}{}
+
+\titlespacing{\chapter}{0pt}{20pt}{30pt}
+\titlespacing{\section}{0pt}{18pt}{8pt}
+\titlespacing{\subsection}{0pt}{14pt}{6pt}
+
+% -- Headers & Footers -------------------------------------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{cecyteGreen!70}\slshape Inventario HOIL}
+\fancyhead[R]{\small\color{cecyteGreen!70}\slshape Documentación técnica}
+\fancyfoot[C]{\small\color{cecyteGreen!70}\thepage}
+\renewcommand{\headrulewidth}{0.8pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{cecyteGreen!40}\leaders\hrule height \headrulewidth\hfill}}
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyfoot[C]{\small\color{cecyteGreen!70}\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+}
+
+% -- Hyperlinks --------------------------------------------
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=cecyteGreen,
+  urlcolor=cecyteDark,
+  citecolor=cecyteGreen,
+  pdftitle={Inventario HOIL --- Documentación técnica},
+  pdfauthor={Cristian Alejandro Hoil Reyes},
+  pdfsubject={Documentación técnica del sistema de inventario para el taller de refrigeración del CECYTE},
+}
+
+% -- Lists -------------------------------------------------
+\usepackage{enumitem}
+\setlist{leftmargin=1.5cm,itemsep=3pt,topsep=4pt}
+\setlist[enumerate]{label=\arabic*.,ref=\arabic*}
+
+% -- Caption style -----------------------------------------
+\usepackage{caption}
+\captionsetup{font={small,color=cecyteDark},labelfont={bf,color=cecyteGreen}}
+
+% -- Boxes for notes ---------------------------------------
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\newtcolorbox{notebox}{
+  colback=cecyteLight,
+  colframe=cecyteGreen,
+  arc=4pt,
+  boxrule=0.8pt,
+  left=8pt,
+  right=8pt,
+  top=6pt,
+  bottom=6pt,
+}
+
+% ═══════════════════════════════════════════════════════════
+% DOCUMENT
+% ═══════════════════════════════════════════════════════════
+\begin{document}
+
+% -- Title page --------------------------------------------
+\thispagestyle{empty}
+\begin{center}
+
+\vspace*{4cm}
+
+{\fontsize{48}{52}\selectfont\bfseries\color{cecyteGreen}HOIL}
+
+\vspace{8pt}
+
+{\Large\bfseries\color{cecyteDark}Sistema de Inventario}
+
+\vspace{16pt}
+
+\textcolor{cecyteGreen}{\rule{6cm}{1.2pt}}
+
+\vspace{16pt}
+
+{\large\color{gray}Documentación técnica completa}
+
+\vspace{32pt}
+
+{\normalsize
+Cristian Alejandro Hoil Reyes
+
+\vspace{8pt}
+
+CECYTE --- Taller de Refrigeración
+
+\vspace{8pt}
+
+2026
+}
+
+\vfill
+
+\textcolor{cecyteGreen!30}{\rule{\textwidth}{6pt}}
+
+\end{center}
+
+\clearpage
+
+% -- Table of contents -------------------------------------
+\pagestyle{empty}
+\tableofcontents
+\clearpage
+\pagestyle{fancy}
+
+% ═══════════════════════════════════════════════════════════
+% CHAPTER 1 — RESUMEN
+% ═══════════════════════════════════════════════════════════
+\chapter{Resumen}
+
+\section{Propósito}
+
+Inventario HOIL es un sistema web para administrar materiales, equipos, usuarios y movimientos del taller de refrigeración del CECYTE. La aplicación está pensada para dos perfiles operativos: \textbf{administrador} y \textbf{representante de equipo}.
+
+\section{Objetivo funcional}
+
+El sistema centraliza el control de inventario, préstamos, devoluciones, consumos y reportes con trazabilidad completa. Además, ofrece actualizaciones en vivo mediante Supabase Realtime para que los cambios de stock se reflejen sin recargar manualmente la interfaz.
+
+\section{Alcance}
+
+El alcance actual cubre:
+
+\begin{itemize}
+  \item autenticación por correo/contraseña y Google OAuth;
+  \item dashboard administrativo con indicadores y gráficos;
+  \item CRUD de materiales, equipos y usuarios;
+  \item préstamos, devoluciones y consumo de materiales;
+  \item reportes filtrados por fecha, tipo y búsqueda textual;
+  \item pruebas unitarias y pruebas end-to-end.
+\end{itemize}
+
+\section{Lecturas complementarias}
+
+La carpeta \file{docs/} contiene documentación previa en Markdown. Esta versión \LaTeX{} la sintetiza y la organiza para revisión técnica:
+
+\begin{itemize}
+  \item \file{00\_stack\_y\_arquitectura.md}
+  \item \file{01\_contexto\_y\_objetivos.md}
+  \item \file{02\_requerimientos\_y\_roles.md}
+  \item \file{03\_catalogo\_materiales.md}
+  \item \file{04\_ui\_ux\_y\_diseno.md}
+  \item \file{05\_plantilla\_generador\_manual.md}
+  \item \file{06\_modelo\_base\_datos.md}
+  \item \file{07\_kpis\_y\_dashboard.md}
+  \item \file{08\_estado\_funcional\_actual.md}
+  \item \file{09\_google\_oauth.md}
+\end{itemize}
+
+% ═══════════════════════════════════════════════════════════
+% CHAPTER 2 — STACK, ARQUITECTURA Y ESTRUCTURA
+% ═══════════════════════════════════════════════════════════
+\chapter{Stack, arquitectura y estructura}
+
+\section{Stack tecnológico}
+
+\begin{table}[H]
+\centering
+\caption{Stack tecnológico completo}
+\begin{tabular}{@{}L{4cm}L{5cm}L{6cm}@{}}
+\toprule
+\rowcolor{cecyteLight}
+\textbf{Capa} & \textbf{Tecnología} & \textbf{Versión / Nota} \\
+\midrule
+Frontend       & Next.js (App Router)        & 14.2.35, React 18 \\
+Hosting        & Vercel                      & Free tier (100 GB/mes) \\
+Backend / BD   & Supabase                    & PostgreSQL gestionado + Auth + Realtime \\
+ORM            & Drizzle ORM                 & 0.45.2, tipado, migraciones TypeScript \\
+Estilos        & Tailwind CSS                & 3.4.1, utility-first \\
+Componentes UI & shadcn/ui (Radix)           & \file{components.json}, base-nova style \\
+Iconos         & Lucide React                & 1.14.0 \\
+Gráficos       & Recharts                    & 3.8.1, declarativo, nativo React \\
+Lenguaje       & TypeScript                  & 5.x, \texttt{strict} mode \\
+Gestor paquetes& pnpm (Corepack)             & 9.15.9 \\
+Pruebas unit.  & Vitest                      & 4.1.6, jsdom \\
+Pruebas E2E    & Playwright                  & 1.60.0, Chromium + Mobile \\
+Repositorio    & GitHub                      & CI/CD automático a Vercel \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Justificación de la arquitectura}
+
+La elección de Next.js + Supabase sobre alternativas como Laravel se fundamenta en tres criterios principales:
+
+\begin{enumerate}
+  \item \textbf{Costo \$0 total:} Vercel y Supabase en sus tiers gratuitos cubren holgadamente el uso esperado del taller (aproximadamente 50 alumnos). No hay servidor que administrar, ni Apache, PHP o SSL que configurar.
+  \item \textbf{Tiempo real nativo:} Supabase Realtime permite recibir actualizaciones de inventario sin refrescar la página. En Laravel esto requeriría WebSockets, Echo y Redis adicionales.
+  \item \textbf{Google OAuth integrado:} Supabase Auth incluye el proveedor Google sin paquetes externos adicionales.
+\end{enumerate}
+
+\section{Decisión arquitectónica principal}
+
+El proyecto evita una API REST intermedia. Las páginas del App Router leen datos directamente desde Supabase en componentes servidor, mientras que las mutaciones se concentran en Server Actions. Esto reduce capas innecesarias y deja la lógica de permisos en un punto muy claro.
+
+\section{Diagrama de arquitectura}
+
+\begin{figure}[H]
+\centering
+\begin{verbatim}
++------------------------------------------+
+|                 Vercel                    |
+|  +------------------------------------+  |
+|  |        Next.js App Router          |  |
+|  |  +----------+  +----------------+  |  |
+|  |  |  Server   |  |    Client      |  |  |
+|  |  |Components |  |  Components    |  |  |
+|  |  | (SSR/ISR) |  |(useEffect/etc) |  |  |
+|  |  +-----+-----+  +-------+--------+  |  |
+|  |        |                |            |  |
+|  |        |    Supabase    |            |  |
+|  |        |   JS Client ---+            |  |
+|  |        |   (server + browser)        |  |
+|  +--------+-----------------------------+  |
++-----------+--------------------------------+
+            |
++-----------+--------------------------------+
+|           v          Supabase              |
+|  +--------------------------------------+ |
+|  |         PostgreSQL (SQL)             | |
+|  |  +--------+ +--------+ +---------+  | |
+|  |  | auth.  | | public.| | public. |  | |
+|  |  | users  | |perfiles| |  resto  |  | |
+|  |  +--------+ +--------+ +---------+  | |
+|  +--------------------------------------+ |
+|  +--------------+ +--------------------+  |
+|  |  Realtime    | |   Row Level        |  |
+|  |Subscriptions | |   Security (RLS)   |  |
+|  +--------------+ +--------------------+  |
++-------------------------------------------+
+\end{verbatim}
+\caption{Arquitectura del sistema: Next.js en Vercel + Supabase}
+\end{figure}
+
+\section{Flujo de datos}
+
+\begin{enumerate}
+  \item El usuario hace login a través del formulario de credenciales o Google OAuth. Supabase Auth devuelve un JWT y el \file{auth.users.id}.
+  \item El middleware de Next.js (\file{src/middleware.ts}) verifica la sesión y el rol en cada petición, redirigiendo según corresponda.
+  \item Los Server Components leen datos directamente de Supabase sin exponer la base de datos al cliente.
+  \item Los Client Components usan Supabase Realtime para recibir actualizaciones en vivo (por ejemplo, cambios de stock mientras otro representante solicita material).
+  \item Las mutaciones (crear préstamo, devolver, consumir) son Server Actions de Next.js que escriben a Supabase usando el cliente \textit{service\_role} para evitar bloqueos de RLS. Realtime notifica a los demás clientes tras cada cambio.
+\end{enumerate}
+
+\section{Rutas del App Router}
+
+\begin{table}[H]
+\centering
+\caption{Endpoints principales}
+\begin{tabular}{@{}L{5.5cm}L{10cm}@{}}
+\toprule
+\rowcolor{cecyteLight}
+\textbf{Ruta} & \textbf{Propósito} \\
+\midrule
+\file{/}                          & Redirección al dashboard según rol \\
+\file{/login}                     & Login con correo/contraseña y Google OAuth \\
+\file{/auth/callback}             & Callback OAuth, intercambio de código \\
+\file{/auth/signout}              & Cierre de sesión \\
+\file{/dashboard}                 & Admin: KPIs y resumen \\
+\file{/dashboard/materiales}      & Admin: catálogo, stock, imágenes, eliminación \\
+\file{/dashboard/equipos}         & Admin: gestión de equipos \\
+\file{/dashboard/usuarios}        & Admin: perfiles, restablecimiento de contraseña \\
+\file{/dashboard/reportes}        & Admin: reportes filtrados, exportación CSV \\
+\file{/equipo}                    & Representante: panel principal \\
+\file{/equipo/pedir}              & Representante: solicitar préstamo \\
+\file{/equipo/devolver}           & Representante: devolver material \\
+\file{/equipo/consumo}            & Representante: reportar consumo \\
+\file{/equipo/historial}          & Representante: historial del equipo \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Organización de directorios}
+
+\begin{verbatim}
+Proyecto_Hoil/
++-- src/
+|   +-- app/                    # Next.js App Router
+|   |   +-- (auth)/login/       # Página de login
+|   |   +-- (dashboard)/        # Shell y páginas del administrador
+|   |   |   +-- layout.tsx       # Sidebar + bottom tabs + signout
+|   |   |   +-- dashboard/       # KPIs y panel principal
+|   |   |   +-- materiales/      # Catálogo CRUD + imágenes
+|   |   |   +-- equipos/         # Gestión de equipos
+|   |   |   +-- usuarios/        # Perfiles + reset password
+|   |   |   +-- reportes/        # Reportes filtrados
+|   |   +-- (equipo)/            # Shell y páginas del representante
+|   |   |   +-- layout.tsx       # Header + info equipo + signout
+|   |   |   +-- equipo/          # Pedir, devolver, consumir
+|   |   +-- auth/callback/       # Callback OAuth
+|   |   +-- auth/signout/        # Ruta de cierre de sesión
+|   |   +-- page.tsx             # Landing: redirección por rol
+|   |   +-- layout.tsx           # Layout raíz
+|   +-- components/
+|   |   +-- ui/                  # Componentes shadcn/ui (button, card, ...)
+|   |   +-- dashboard/           # Componentes específicos del dashboard
+|   |   +-- forms/               # Formularios reutilizables
+|   |   +-- realtime-refresh.tsx  # Indicador de refresco en tiempo real
+|   |   +-- search-box.tsx        # Búsqueda con debounce
+|   +-- lib/
+|       +-- actions/
+|       |   +-- admin.ts         # Server Actions del administrador
+|       |   +-- prestamos.ts     # Server Actions de préstamos
+|       +-- db/
+|       |   +-- schema.ts        # Esquema Drizzle ORM + relaciones
+|       |   +-- queries.ts       # Funciones KPI y consultas
+|       |   +-- seed.ts          # Datos semilla
+|       +-- domain/
+|       |   +-- inventory.ts     # Reglas de negocio puras
+|       +-- supabase/
+|       |   +-- server.ts        # Clientes Supabase (server + admin)
+|       |   +-- client.ts        # Cliente Supabase para navegador
+|       +-- utils.ts             # Utilidades generales
++-- supabase/
+|   +-- migrations/              # Migraciones SQL (0001-0004)
++-- tests/
+|   +-- unit/
+|   |   +-- inventory.test.ts    # Unit tests de reglas de dominio
+|   +-- e2e/                     # Tests E2E con Playwright
+|   +-- setup.ts                 # Setup global de Vitest
++-- docs/                        # Documentación complementaria (00-09)
++-- package.json
++-- tsconfig.json
++-- next.config.mjs
++-- tailwind.config.ts
++-- vitest.config.ts
++-- playwright.config.ts
++-- drizzle.config.ts
++-- components.json              # Configuración de shadcn/ui
++-- README.md
+\end{verbatim}
+
+\section{Mapa de archivos principales}
+
+\begin{longtable}{@{}L{5.5cm}L{9.5cm}@{}}
+\toprule
+\rowcolor{cecyteLight}
+\textbf{Archivo} & \textbf{Responsabilidad} \\
+\midrule
+\endfirsthead
+\toprule
+\rowcolor{cecyteLight}
+\textbf{Archivo} & \textbf{Responsabilidad} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\file{src/app/page.tsx} &
+  Punto de entrada. Redirige usuarios autenticados a \file{/dashboard} o \file{/equipo} según el rol. \\
+
+\file{src/app/(auth)/login/page.tsx} &
+  Formulario de login con correo/contraseña y botón de Google OAuth. Validación client-side y server-side. \\
+
+\file{src/app/auth/callback/route.ts} &
+  Intercambia el código OAuth de Google por una sesión Supabase y redirige al usuario según su rol. \\
+
+\file{src/app/(dashboard)/layout.tsx} &
+  Shell del administrador: sidebar en desktop, bottom tab bar en móvil, navegación, nombre de usuario y botón de cierre de sesión. Incluye \file{RealtimeRefresh}. \\
+
+\file{src/app/(equipo)/layout.tsx} &
+  Shell del representante: header con nombre del equipo, cierre de sesión, indicador de tiempo real. \\
+
+\file{src/app/(dashboard)/dashboard/page.tsx} &
+  Dashboard del admin con 9 KPIs: total materiales, prestado vs disponible, stock bajo, top 5, equipos activos, movimientos, tasa devolución, estado materiales, consumibles agotados. \\
+
+\file{src/app/(dashboard)/dashboard/materiales/page.tsx} &
+  CRUD de materiales con búsqueda, filtro por categoría, carga de imágenes a Supabase Storage, entrada de stock, eliminación lógica. \\
+
+\file{src/app/(dashboard)/dashboard/equipos/page.tsx} &
+  CRUD de equipos con validación de dependencias antes de eliminar. \\
+
+\file{src/app/(dashboard)/dashboard/usuarios/page.tsx} &
+  CRUD de perfiles, creación de cuentas con contraseña, restablecimiento de contraseña, eliminación con verificación de historial. \\
+
+\file{src/app/(dashboard)/dashboard/reportes/page.tsx} &
+  Vista de reportes con filtros por período (hora, día, semana, mes), tipo de movimiento, equipo y material. Exportación a CSV. \\
+
+\file{src/app/(equipo)/equipo/page.tsx} &
+  Panel del representante: catálogo de materiales disponibles, préstamos activos, acciones de pedir, devolver y consumir. \\
+
+\file{src/lib/actions/admin.ts} &
+  Server Actions del admin: \file{createMaterial}, \file{updateMaterial}, \file{deleteMaterial}, \file{addMaterialStock}, \file{createEquipo}, \file{updateEquipo}, \file{deleteEquipo}, \file{createUsuario}, \file{updatePerfil}, \file{resetUsuarioPassword}, \file{deletePerfil}, \file{updateMaterialImage}, \file{deleteMaterialImage}. Todas verifican \file{requireAdmin()}. \\
+
+\file{src/lib/actions/prestamos.ts} &
+  Server Actions del representante: \file{pedirMaterial}, \file{devolverMaterial}, \file{consumirMaterial}. Verifican \file{requireRepresentante()} y validan disponibilidad con reglas de dominio. \\
+
+\file{src/lib/db/schema.ts} &
+  Esquema Drizzle ORM: tablas \file{equipos}, \file{perfiles}, \file{materiales}, \file{movimientos}, \file{prestamos} con checks, defaults y relaciones. Tipos inferidos exportados. \\
+
+\file{src/lib/db/queries.ts} &
+  Funciones KPI: \file{getKpiMaterialesTotal}, \file{getPrestadoVsDisponible}, \file{getKpiStockBajo}, \file{getTopMateriales}, \file{getEquiposActividad}, \file{getMovimientosPorPeriodo}, \file{getKpiTasaDevolucion}, \file{getEstadoMateriales}, \file{getConsumiblesAgotados}. \\
+
+\file{src/lib/domain/inventory.ts} &
+  Reglas de negocio puras: \file{calcularPrestadoPendiente}, \file{calcularDisponible}, \file{validarCantidadDisponible}, \file{validarDevolucionPendiente}, \file{esConsumible}. \\
+
+\file{src/lib/supabase/server.ts} &
+  Dos clientes Supabase: \file{createClient()} con cookies de sesión para Server Components; \file{createAdminClient()} con \textit{service\_role} para mutaciones privilegiadas. \\
+
+\file{src/lib/supabase/client.ts} &
+  Cliente Supabase para el navegador: usa \file{createBrowserClient} de \pkg{@supabase/ssr}. \\
+
+\file{src/middleware.ts} &
+  Middleware de Next.js: refresca sesión Supabase, protege rutas por rol (admin no accede a \file{/equipo}, representante no accede a \file{/dashboard}), redirige usuarios no autenticados a \file{/login}. \\
+
+\file{src/components/realtime-refresh.tsx} &
+  Componente cliente que se suscribe a cambios en \file{materiales} y \file{prestamos} vía Supabase Realtime y llama a \file{router.refresh()} para actualizar Server Components. \\
+
+\file{src/components/search-box.tsx} &
+  Campo de búsqueda con debounce de 300ms, controlado mediante URL search params. \\
+
+\file{supabase/migrations/0001\_schema.sql} &
+  Migración inicial: creación de tablas, índices, triggers \file{updated\_at}. \\
+
+\file{supabase/migrations/0002\_rls.sql} &
+  Políticas RLS por tabla y rol. \\
+
+\file{supabase/migrations/0003\_materiales\_soft\_delete.sql} &
+  Columnas \file{activo} y \file{eliminado\_at} para eliminación lógica de materiales. \\
+
+\file{supabase/migrations/0004\_material\_images.sql} &
+  Columnas \file{imagen\_url} e \file{imagen\_path} y bucket \file{materiales} en Storage. \\
+
+\file{tailwind.config.ts} &
+  Configuración de Tailwind con colores institucionales CECYTE, variables CSS de shadcn/ui, tipografía Inter. \\
+
+\file{tsconfig.json} &
+  Configuración TypeScript con \file{strict: true} y alias \file{@/} → \file{src/}. \\
+
+\file{playwright.config.ts} &
+  Playwright con proyectos Chromium desktop y Pixel 5 mobile, \file{baseURL} configurable y \file{webServer} automático. \\
+
+\file{vitest.config.ts} &
+  Vitest con entorno jsdom, plugin React, setup global, alias \file{@/}, cobertura v8 sobre \file{src/lib/domain/}. \\
+
+\file{drizzle.config.ts} &
+  Configuración de Drizzle Kit para migraciones: schema en \file{src/lib/db/schema.ts}, salida en \file{supabase/migrations/}. \\
+
+\file{components.json} &
+  Configuración de shadcn/ui: estilo base-nova, server components, alias, colores neutral con CSS variables. \\
+\bottomrule
+\end{longtable}
+
+\section{Convenciones técnicas}
+
+\begin{itemize}
+  \item pnpm se usa vía Corepack.
+  \item El código acepta variables de Supabase nuevas y legacy por compatibilidad local.
+  \item La disponibilidad de material no se almacena: se calcula.
+  \item La bitácora de movimientos es inmutable y sirve como trazabilidad.
+\end{itemize}
+
+% ═══════════════════════════════════════════════════════════
+% CHAPTER 3 — AUTENTICACIÓN Y ROLES
+% ═══════════════════════════════════════════════════════════
+\chapter{Autenticación y roles}
+
+\section{Métodos de autenticación}
+
+El sistema soporta dos métodos de autenticación mediante Supabase Auth:
+
+\begin{enumerate}
+  \item \textbf{Correo electrónico y contraseña}: método primario. Las cuentas son creadas por el administrador desde \file{Dashboard > Usuarios}, quien define una contraseña inicial. El representante puede cambiar su contraseña posteriormente.
+  \item \textbf{Google OAuth}: método secundario con cuenta institucional de CECYTE. Requiere que el usuario ya tenga un perfil en \file{public.perfiles} con el mismo correo. Si un usuario se autentica con Google pero no tiene perfil, la aplicación cierra la sesión y muestra un mensaje de acceso no habilitado.
+\end{enumerate}
+
+\section{Modelo de sesión}
+
+Supabase Auth gestiona la tabla \file{auth.users} automáticamente. La aplicación mantiene una tabla de dominio \file{public.perfiles} vinculada 1:1 por \file{id} a \file{auth.users.id}. Esta separación permite que:
+
+\begin{itemize}
+  \item Supabase maneje la autenticación (JWT, refresh tokens, expiración).
+  \item La aplicación maneje los datos de dominio (matrícula, nombre, rol, equipo) sin depender del esquema de auth.
+\end{itemize}
+
+\section{Flujo de autenticación}
+
+\begin{enumerate}
+  \item El usuario accede a \file{/login}.
+  \item Si ingresa credenciales, el formulario llama a \file{supabase.auth.signInWithPassword()}.
+  \item Si usa Google, se invoca \file{supabase.auth.signInWithOAuth()} con redirección a \file{/auth/callback}.
+  \item En \file{/auth/callback}, el Route Handler intercambia el código OAuth por una sesión Supabase y consulta \file{public.perfiles} para determinar el rol.
+  \item Si el usuario no tiene perfil, se cierra la sesión con \file{supabase.auth.signOut()} y se muestra un mensaje de error.
+  \item Si el perfil existe, se redirige al dashboard correspondiente: \file{/dashboard} para admin, \file{/equipo} para representante.
+\end{enumerate}
+
+\section{Roles del sistema}
+
+\begin{table}[H]
+\centering
+\caption{Roles de usuario}
+\begin{tabular}{@{}L{3cm}L{3.5cm}L{8.5cm}@{}}
+\toprule
+\rowcolor{cecyteLight}
+\textbf{Rol} & \textbf{Usuario típico} & \textbf{Permisos} \\
+\midrule
+\file{admin} & Docente / Encargado del taller &
+  Acceso total: CRUD de materiales, equipos y usuarios; KPIs; reportes; exportación CSV; creación y restablecimiento de contraseñas. \\
+\file{representante} & Alumno designado como responsable de equipo &
+  Solo su equipo: solicitar préstamos, devolver material, reportar consumos, ver historial. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Cada representante pertenece a un único equipo (\file{equipo\_id} en \file{perfiles}) y es el único autorizado para realizar movimientos en nombre de ese equipo. Los administradores tienen \file{equipo\_id = NULL}.
+
+\section{Protección de rutas por rol}
+
+El middleware de Next.js (\file{src/middleware.ts}) implementa la siguiente lógica:
+
+\begin{enumerate}
+  \item \textbf{Sin sesión:} solo se permite acceso a \file{/login} y \file{/auth/*}. Cualquier otra ruta redirige a \file{/login}.
+  \item \textbf{Con sesión en \file{/login}:} redirige al dashboard según el rol.
+  \item \textbf{Admin en \file{/equipo/*}:} redirige a \file{/dashboard}.
+  \item \textbf{Representante en \file{/dashboard/*} o \file{/admin/*}:} redirige a \file{/equipo}.
+\end{enumerate}
+
+Además del middleware, cada layout de dashboard verifica nuevamente el rol y redirige si no coincide. Esto constituye una defensa en profundidad.
+
+\section{Creación de usuarios}
+
+El flujo de creación desde la aplicación (\file{src/lib/actions/admin.ts}, \file{createUsuario}):
+
+\begin{enumerate}
+  \item Verifica que el solicitante sea admin (\file{requireAdmin()}).
+  \item Llama a \file{supabase.auth.admin.createUser()} con email, contraseña y \file{email\_confirm: true}.
+  \item Inserta el perfil en \file{public.perfiles} vinculado por \file{id}.
+  \item Si la inserción del perfil falla (por matrícula duplicada), elimina la cuenta auth creada para mantener consistencia.
+\end{enumerate}
+
+\section{Restablecimiento de contraseña}
+
+El admin puede restablecer la contraseña de cualquier usuario desde \file{Dashboard > Usuarios} mediante la Server Action \file{resetUsuarioPassword()}, que usa \file{supabase.auth.admin.updateUserById()} con la nueva contraseña (mínimo 6 caracteres).
+
+\section{Consideraciones de operación para Google OAuth}
+
+\begin{itemize}
+  \item Requiere registro de credenciales en Google Cloud Console y habilitación del proveedor en Supabase Auth.
+  \item Las URLs de redirección autorizadas deben incluir tanto \file{http://localhost:3000/auth/callback} como la URL de producción.
+  \item El login muestra un aviso de \textit{«¿Necesitas una cuenta?»} para aclarar que Google no asigna permisos por sí solo: el perfil debe haber sido creado previamente por un administrador.
+\end{itemize}
+
+% ═══════════════════════════════════════════════════════════
+% CHAPTER 4 — FLUJOS FUNCIONALES Y REGLAS DE NEGOCIO
+% ═══════════════════════════════════════════════════════════
+\chapter{Flujos funcionales y reglas de negocio}
+
+\section{Flujo de préstamo de material}
+
+\begin{enumerate}
+  \item \textbf{Seleccionar material:} el representante ve la lista de materiales disponibles con sus cantidades. La disponibilidad se calcula en tiempo real como \file{cantidad\_total} menos préstamos activos pendientes.
+  \item \textbf{Indicar cantidad:} el representante elige la cantidad deseada mediante un campo numérico. La Server Action \file{pedirMaterial()} en \file{src/lib/actions/prestamos.ts} valida:
+    \begin{itemize}
+      \item Que el usuario sea representante con equipo asignado (\file{requireRepresentante()}).
+      \item Que la cantidad sea un entero positivo (\file{getPositiveInt()}).
+      \item Que haya stock disponible suficiente (\file{validarCantidadDisponible()} de \file{src/lib/domain/inventory.ts}).
+    \end{itemize}
+  \item \textbf{Confirmar:} al enviar el formulario, la Server Action:
+    \begin{enumerate}
+      \item Inserta un registro en \file{prestamos} con \file{estado = 'activo'}.
+      \item Inserta un registro en \file{movimientos} con \file{tipo = 'salida\_prestamo'}.
+      \item Vincula el movimiento al préstamo mediante \file{movimiento\_salida\_id}.
+      \item Ejecuta \file{revalidatePath} en \file{/equipo} y \file{/dashboard} para refrescar las vistas.
+    \end{enumerate}
+\end{enumerate}
+
+\section{Flujo de devolución de material}
+
+\begin{enumerate}
+  \item \textbf{Ver préstamos activos:} el representante visualiza la lista de préstamos activos de su equipo. Cada préstamo muestra el material, la cantidad prestada y la cantidad pendiente por devolver.
+  \item \textbf{Seleccionar devolución:} el representante elige un préstamo y la cantidad a devolver. La Server Action \file{devolverMaterial()} valida:
+    \begin{itemize}
+      \item Que el préstamo pertenezca al equipo del representante.
+      \item Que el préstamo esté en estado \file{'activo'}.
+      \item Que la cantidad a devolver no supere lo pendiente (\file{validarDevolucionPendiente()}).
+    \end{itemize}
+  \item \textbf{Confirmar:} al enviar:
+    \begin{enumerate}
+      \item Se incrementa \file{cantidad\_devuelta} en el préstamo.
+      \item Si \file{cantidad\_devuelta} alcanza o supera \file{cantidad\_prestada}, el estado cambia a \file{'devuelto'}.
+      \item Se inserta un registro en \file{movimientos} con \file{tipo = 'entrada\_devolucion'}.
+      \item Se ejecuta \file{revalidatePath}.
+    \end{enumerate}
+\end{enumerate}
+
+La devolución parcial está soportada: el representante puede devolver solo una parte del material prestado. El préstamo permanece activo hasta que la suma de devoluciones iguale o supere lo prestado.
+
+\section{Flujo de consumo de material}
+
+\begin{enumerate}
+  \item \textbf{Identificar material consumible:} el representante ve los materiales de tipo \file{consumible} disponibles para su equipo.
+  \item \textbf{Reportar cantidad consumida:} ingresa la cantidad. La Server Action \file{consumirMaterial()} valida:
+    \begin{itemize}
+      \item Que el material sea de categoría \file{'consumible'} (\file{esConsumible()}).
+      \item Que haya stock disponible suficiente.
+    \end{itemize}
+  \item \textbf{Confirmar:} al enviar:
+    \begin{enumerate}
+      \item Se decrementa \file{cantidad\_total} del material.
+      \item Se inserta un registro en \file{movimientos} con \file{tipo = 'consumo'}. No se crea registro en \file{prestamos}.
+      \item Se ejecuta \file{revalidatePath}.
+    \end{enumerate}
+\end{enumerate}
+
+\begin{notebox}
+\textbf{Diferencia clave con el préstamo:} el consumo descuenta directamente \file{cantidad\_total} sin crear un préstamo, porque el material se gastó y no es retornable.
+\end{notebox}
+
+\section{Flujo de entrada de stock (Admin)}
+
+\begin{enumerate}
+  \item El admin selecciona un material existente desde el catálogo.
+  \item Ingresa la cantidad a añadir. La Server Action \file{addMaterialStock()} valida que el material esté activo y la cantidad sea positiva.
+  \item Al confirmar:
+    \begin{enumerate}
+      \item Se incrementa \file{cantidad\_total} del material.
+      \item Se inserta un registro en \file{movimientos} con \file{tipo = 'entrada\_stock'}.
+      \item Se ejecuta \file{revalidatePath}.
+    \end{enumerate}
+\end{enumerate}
+
+\section{Creación y edición de materiales (Admin)}
+
+\subsection{Creación}
+
+La Server Action \file{createMaterial()} en \file{src/lib/actions/admin.ts}:
+
+\begin{enumerate}
+  \item Verifica que el solicitante sea admin.
+  \item Valida campos obligatorios (nombre, categoría, estado, cantidades no negativas).
+  \item Inserta el material en \file{public.materiales}.
+  \item Si se adjuntó una imagen, la sube a Supabase Storage (bucket \file{materiales}) y actualiza \file{imagen\_url} e \file{imagen\_path}.
+  \item Si la cantidad inicial es mayor a 0, registra un movimiento \file{entrada\_stock}.
+\end{enumerate}
+
+\subsection{Edición}
+
+La Server Action \file{updateMaterial()} permite modificar \file{nombre}, \file{categoria}, \file{estado} y \file{stock\_minimo}. \file{cantidad\_total} solo se modifica mediante movimientos (\file{entrada\_stock} o \file{consumo}), nunca por edición directa.
+
+\subsection{Imagen guía}
+
+Las Server Actions \file{updateMaterialImage()} y \file{deleteMaterialImage()} gestionan la imagen asociada al material:
+
+\begin{itemize}
+  \item Las imágenes se almacenan en el bucket público \file{materiales} de Supabase Storage.
+  \item Solo admins pueden subir, reemplazar o eliminar imágenes.
+  \item El tamaño máximo es 5 MB. Formatos aceptados: JPEG, PNG, WebP, GIF.
+  \item Al reemplazar o eliminar, se borra el archivo anterior del storage.
+\end{itemize}
+
+\subsection{Eliminación lógica}
+
+La Server Action \file{deleteMaterial()} implementa eliminación lógica:
+
+\begin{enumerate}
+  \item Verifica que el material esté activo y no tenga préstamos activos pendientes.
+  \item Si hay préstamos activos, rechaza la operación con un mensaje descriptivo.
+  \item Marca \file{activo = false} y establece \file{eliminado\_at} con la fecha actual.
+  \item Inserta un movimiento \file{eliminacion\_material} para trazabilidad.
+\end{enumerate}
+
+\section{Gestión de equipos (Admin)}
+
+\begin{itemize}
+  \item \textbf{Creación:} \file{createEquipo()} requiere solo el nombre.
+  \item \textbf{Edición:} \file{updateEquipo()} modifica el nombre.
+  \item \textbf{Eliminación:} \file{deleteEquipo()} verifica que el equipo no tenga representantes ni préstamos asociados antes de eliminar. Si tiene dependencias, rechaza la operación.
+\end{itemize}
+
+\section{Gestión de usuarios (Admin)}
+
+\begin{itemize}
+  \item \textbf{Creación:} \file{createUsuario()} crea la cuenta en Supabase Auth e inserta el perfil. Si la inserción del perfil falla (matrícula duplicada), revierte la creación de la cuenta auth.
+  \item \textbf{Edición:} \file{updatePerfil()} modifica nombre, matrícula, rol y equipo.
+  \item \textbf{Restablecer contraseña:} \file{resetUsuarioPassword()} usa la API admin de Supabase Auth.
+  \item \textbf{Eliminación:} \file{deletePerfil()} bloquea la auto-eliminación del admin activo y verifica que el usuario no tenga historial de préstamos o movimientos.
+\end{itemize}
+
+\section{Reglas de negocio}
+
+\begin{itemize}
+  \item No se puede pedir más material del disponible.
+  \item No se puede devolver más de lo pendiente.
+  \item Solo materiales de tipo \file{consumible} pueden reportarse como consumo.
+  \item Un equipo con historial o representantes no puede eliminarse.
+  \item Un material con préstamos activos no puede eliminarse físicamente; se elimina de forma lógica.
+\end{itemize}
+
+% ═══════════════════════════════════════════════════════════
+% CHAPTER 5 — MODELO DE DATOS
+% ═══════════════════════════════════════════════════════════
+\chapter{Modelo de datos}
+
+El modelo de datos está compuesto por cinco tablas principales en el esquema \file{public} de PostgreSQL, más la tabla \file{auth.users} gestionada por Supabase Auth. El esquema se define en TypeScript mediante Drizzle ORM (\file{src/lib/db/schema.ts}) y se materializa mediante migraciones SQL en \file{supabase/migrations/}.
+
+\section{Diagrama Entidad-Relación}
+
+\begin{verbatim}
+auth.users --1:1-- perfiles --N:1-- equipos
+                    |                    |
+                    |                    |
+                    v                    v
+              movimientos <------- prestamos
+                    |                    |
+                    |                    |
+                    v                    v
+                materiales <-------------+
+\end{verbatim}
+
+\section{Tabla \texttt{perfiles}}
+
+Vinculada 1:1 con \file{auth.users}. Extiende los datos del usuario con información de dominio.
+
+\begin{table}[H]
+\centering
+\caption{Columnas de \file{public.perfiles}}
+\begin{tabular}{@{}L{3.5cm}L{4cm}L{8cm}@{}}
+\toprule
+\rowcolor{cecyteLight}
+\textbf{Columna} & \textbf{Tipo} & \textbf{Restricciones} \\
+\midrule
+\file{id}        & UUID (PK) & FK → \file{auth.users.id} \\
+\file{matricula} & TEXT      & UNIQUE, NOT NULL \\
+\file{nombre}    & TEXT      & NOT NULL \\
+\file{rol}       & TEXT      & NOT NULL, CHECK IN (\file{'admin'}, \file{'representante'}) \\
+\file{equipo\_id}& UUID      & FK → \file{equipos.id}, NULLABLE \\
+\file{created\_at}&TIMESTAMPTZ& DEFAULT \file{now()} \\
+\file{updated\_at}&TIMESTAMPTZ& DEFAULT \file{now()} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Políticas RLS:} los administradores ven todos los perfiles; los representantes solo ven el suyo.
+
+\section{Tabla \texttt{equipos}}
+
+Grupos de trabajo del taller. Cada equipo tiene un representante (alumno).
+
+\begin{table}[H]
+\centering
+\caption{Columnas de \file{public.equipos}}
+\begin{tabular}{@{}L{3.5cm}L{4cm}L{8cm}@{}}
+\toprule
+\rowcolor{cecyteLight}
+\textbf{Columna} & \textbf{Tipo} & \textbf{Restricciones} \\
+\midrule
+\file{id}        & UUID (PK) & DEFAULT \file{gen\_random\_uuid()} \\
+\file{nombre}    & TEXT      & NOT NULL \\
+\file{created\_at}&TIMESTAMPTZ& DEFAULT \file{now()} \\
+\file{updated\_at}&TIMESTAMPTZ& DEFAULT \file{now()} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Políticas RLS:} admin ve y edita todos; representante solo ve su propio equipo.
+
+\section{Tabla \texttt{materiales}}
+
+Catálogo de materiales, herramientas, consumibles y equipos de protección.
+
+\begin{table}[H]
+\centering
+\caption{Columnas de \file{public.materiales}}
+\begin{tabular}{@{}L{3.5cm}L{4cm}L{8cm}@{}}
+\toprule
+\rowcolor{cecyteLight}
+\textbf{Columna} & \textbf{Tipo} & \textbf{Restricciones} \\
+\midrule
+\file{id}              & UUID (PK) & DEFAULT \file{gen\_random\_uuid()} \\
+\file{nombre}          & TEXT      & NOT NULL \\
+\file{categoria}       & TEXT      & CHECK IN (\file{'herramienta\_manual'}, \file{'consumible'}, \file{'equipo\_proteccion'}, \file{'equipo\_medicion'}) \\
+\file{cantidad\_total} & INTEGER   & NOT NULL, DEFAULT 0, CHECK \(\ge 0\) \\
+\file{stock\_minimo}   & INTEGER   & NOT NULL, DEFAULT 0, CHECK \(\ge 0\) \\
+\file{estado}          & TEXT      & NOT NULL, DEFAULT \file{'bueno'}, CHECK IN (\file{'bueno'}, \file{'desgastado'}, \file{'dañado'}) \\
+\file{imagen\_url}     & TEXT      & NULLABLE, URL pública en Supabase Storage \\
+\file{imagen\_path}    & TEXT      & NULLABLE, ruta en bucket para reemplazo o eliminación \\
+\file{activo}          & BOOLEAN   & NOT NULL, DEFAULT \file{true} (eliminación lógica) \\
+\file{eliminado\_at}   & TIMESTAMPTZ& NULLABLE, fecha de eliminación lógica \\
+\file{created\_at}      & TIMESTAMPTZ& DEFAULT \file{now()} \\
+\file{updated\_at}      & TIMESTAMPTZ& DEFAULT \file{now()} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{notebox}
+\textbf{Nota importante:} la cantidad disponible \textbf{no se almacena} como columna. Se calcula en cada consulta como:
+\[
+\text{cantidad\_total} - \sum \text{préstamos activos.cantidad\_prestada}
+\]
+Esto evita inconsistencias entre el stock reportado y los préstamos reales. La lógica de cálculo reside en \file{src/lib/domain/inventory.ts} y en las consultas KPI de \file{src/lib/db/queries.ts}.
+\end{notebox}
+
+\section{Tabla \texttt{movimientos}}
+
+Bitácora universal de trazabilidad. Es una tabla \textbf{inmutable}: solo se permiten inserciones (INSERT), nunca modificaciones (UPDATE) ni eliminaciones (DELETE).
+
+\begin{table}[H]
+\centering
+\caption{Columnas de \file{public.movimientos}}
+\begin{tabular}{@{}L{3.5cm}L{4cm}L{8cm}@{}}
+\toprule
+\rowcolor{cecyteLight}
+\textbf{Columna} & \textbf{Tipo} & \textbf{Restricciones} \\
+\midrule
+\file{id}          & UUID (PK) & DEFAULT \file{gen\_random\_uuid()} \\
+\file{tipo}        & TEXT      & CHECK IN (\file{'entrada\_stock'}, \file{'salida\_prestamo'}, \file{'entrada\_devolucion'}, \file{'consumo'}, \file{'eliminacion\_material'}) \\
+\file{material\_id} & UUID     & FK → \file{materiales.id}, ON DELETE RESTRICT \\
+\file{cantidad}    & INTEGER   & CHECK: \(>0\) para todos los tipos excepto \file{eliminacion\_material} (\(\ge 0\)) \\
+\file{equipo\_id}  & UUID      & FK → \file{equipos.id}, ON DELETE SET NULL \\
+\file{usuario\_id}  & UUID      & FK → \file{perfiles.id}, ON DELETE CASCADE \\
+\file{prestamo\_id} & UUID      & FK → \file{prestamos.id}, ON DELETE SET NULL \\
+\file{comentario}   & TEXT      & NULLABLE \\
+\file{created\_at}   & TIMESTAMPTZ& DEFAULT \file{now()} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Políticas RLS:} admin ve todos los movimientos; representante solo ve los de su equipo (\file{equipo\_id}).
+
+\section{Tabla \texttt{prestamos}}
+
+Registro de préstamos activos e históricos, con soporte para devolución parcial.
+
+\begin{table}[H]
+\centering
+\caption{Columnas de \file{public.prestamos}}
+\begin{tabular}{@{}L{4cm}L{4cm}L{7.5cm}@{}}
+\toprule
+\rowcolor{cecyteLight}
+\textbf{Columna} & \textbf{Tipo} & \textbf{Restricciones} \\
+\midrule
+\file{id}                   & UUID (PK) & DEFAULT \file{gen\_random\_uuid()} \\
+\file{equipo\_id}            & UUID      & FK → \file{equipos.id}, ON DELETE CASCADE \\
+\file{representante\_id}     & UUID      & FK → \file{perfiles.id}, ON DELETE CASCADE \\
+\file{material\_id}          & UUID      & FK → \file{materiales.id}, ON DELETE RESTRICT \\
+\file{cantidad\_prestada}    & INTEGER   & NOT NULL, CHECK \(>0\) \\
+\file{cantidad\_devuelta}    & INTEGER   & NOT NULL, DEFAULT 0, CHECK \(\ge 0\) \\
+\file{estado}                & TEXT      & NOT NULL, DEFAULT \file{'activo'}, CHECK IN (\file{'activo'}, \file{'devuelto'}) \\
+\file{movimiento\_salida\_id}& UUID      & FK → \file{movimientos.id}, ON DELETE SET NULL \\
+\file{created\_at}            & TIMESTAMPTZ& DEFAULT \file{now()} \\
+\file{updated\_at}            & TIMESTAMPTZ& DEFAULT \file{now()} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Devolución parcial:} cuando un representante devuelve menos de lo prestado, \file{cantidad\_devuelta} se incrementa y el estado permanece \file{'activo'}. Al alcanzar o superar \file{cantidad\_prestada}, el estado cambia a \file{'devuelto'}.
+
+\section{Relaciones entre tablas}
+
+\begin{table}[H]
+\centering
+\caption{Relaciones clave}
+\begin{tabular}{@{}L{4.5cm}L{2.5cm}L{8.5cm}@{}}
+\toprule
+\rowcolor{cecyteLight}
+\textbf{Relación} & \textbf{Tipo} & \textbf{Explicación} \\
+\midrule
+\file{auth.users} → \file{perfiles}   & 1:1 & Cada usuario auth tiene un perfil de dominio. \\
+\file{perfiles} → \file{equipos}      & N:1 & Varios representantes pertenecen a un equipo. Admin tiene \file{NULL}. \\
+\file{equipos} → \file{prestamos}     & 1:N & Un equipo tiene muchos préstamos. \\
+\file{materiales} → \file{prestamos}  & 1:N & Un material puede estar en muchos préstamos. \\
+\file{materiales} → \file{movimientos}& 1:N & Trazabilidad completa de cada material. \\
+\file{prestamos} → \file{movimientos} & 1:N & Un préstamo tiene movimientos asociados (salida, devoluciones). \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Categorías de materiales}
+
+\begin{table}[H]
+\centering
+\caption{Categorías disponibles}
+\begin{tabular}{@{}L{4cm}L{4.5cm}L{7cm}@{}}
+\toprule
+\rowcolor{cecyteLight}
+\textbf{Categoría} & \textbf{Clave} & \textbf{Ejemplos} \\
+\midrule
+Herramienta manual  & \file{herramienta\_manual}  & Pinza de corte, martillo, perica, cortatubos \\
+Consumible          & \file{consumible}          & Cilindro de propano, gas MAP, boquillas \\
+Equipo de protección& \file{equipo\_proteccion}  & Guantes de seguridad, lentes, careta \\
+Equipo de medición  & \file{equipo\_medicion}    & Manómetros, termómetros, multímetros \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Estados de material}
+
+\begin{itemize}
+  \item \file{bueno}: material en condiciones óptimas de uso.
+  \item \file{desgastado}: material funcional pero con signos de uso.
+  \item \file{dañado}: material que requiere reparación o reemplazo.
+\end{itemize}
+
+\section{Tipos de movimiento}
+
+\begin{itemize}
+  \item \file{entrada\_stock}: incremento de \file{cantidad\_total} por el admin.
+  \item \file{salida\_prestamo}: préstamo solicitado por un representante.
+  \item \file{entrada\_devolucion}: devolución (total o parcial) de un préstamo.
+  \item \file{consumo}: material consumible agotado, reportado por representante. No genera préstamo.
+  \item \file{eliminacion\_material}: marcador de trazabilidad cuando un material es eliminado lógicamente.
+\end{itemize}
+
+\section{Stock semilla}
+
+El archivo \file{src/lib/db/seed.ts} contiene los datos iniciales para desarrollo local. Credenciales de prueba:
+
+\begin{table}[H]
+\centering
+\caption{Credenciales seed para desarrollo local}
+\begin{tabular}{@{}L{4cm}L{6cm}L{5.5cm}@{}}
+\toprule
+\rowcolor{cecyteLight}
+\textbf{Rol} & \textbf{Correo} & \textbf{Contraseña} \\
+\midrule
+Admin            & \file{admin@cecyte.edu.mx}  & \file{Admin123!} \\
+Representante 1  & \file{rep1@cecyte.edu.mx}   & \file{Rep12345!} \\
+Representante 2  & \file{rep2@cecyte.edu.mx}   & \file{Rep12345!} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ═══════════════════════════════════════════════════════════
+% CHAPTER 6 — SUPABASE, MIGRACIONES, OPERACIÓN Y PRUEBAS
+% ═══════════════════════════════════════════════════════════
+\chapter{Supabase, migraciones, operación y pruebas}
+
+\section{Supabase local}
+
+La configuración local vive en \file{supabase/config.toml}. Ahí se definen puertos, Auth, Realtime, Storage y el sitio base para callbacks. Las migraciones SQL están en \file{supabase/migrations}.
+
+\section{Migraciones}
+
+\begin{itemize}
+  \item \file{0001\_schema.sql}: esquema base, índices y triggers \file{updated\_at}.
+  \item \file{0002\_rls.sql}: políticas RLS para admin y representante.
+  \item \file{0003\_materiales\_soft\_delete.sql}: soft delete y nuevo tipo de movimiento.
+  \item \file{0004\_material\_images.sql}: imágenes guía y bucket de Storage.
+\end{itemize}
+
+\section{Supabase Storage}
+
+Los materiales pueden tener imagen guía opcional. El bucket \file{materiales} es público y acepta JPEG, PNG, WEBP y GIF, con límite de 5 MB.
+
+\section{Variables de entorno}
+
+\begin{table}[H]
+\centering
+\caption{Variables de entorno requeridas}
+\begin{tabular}{@{}L{5.5cm}L{3cm}L{7cm}@{}}
+\toprule
+\rowcolor{cecyteLight}
+\textbf{Variable} & \textbf{Ámbito} & \textbf{Descripción} \\
+\midrule
+\file{NEXT\_PUBLIC\_SUPABASE\_URL}              & público     & URL del proyecto Supabase \\
+\file{NEXT\_PUBLIC\_SUPABASE\_PUBLISHABLE\_KEY} & público     & Clave anónima/publicable \\
+\file{SUPABASE\_SECRET\_KEY}                    & servidor    & Clave \textit{service\_role} (nunca al cliente) \\
+\file{DATABASE\_URL}                            & servidor    & Conexión directa para migraciones Drizzle \\
+\file{GOOGLE\_CLIENT\_ID}                       & servidor    & Client ID de Google Cloud OAuth \\
+\file{GOOGLE\_CLIENT\_SECRET}                   & servidor    & Client Secret de Google Cloud OAuth \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El código mantiene compatibilidad con las variables legacy locales \file{NEXT\_PUBLIC\_SUPABASE\_ANON\_KEY} y \file{SUPABASE\_SERVICE\_ROLE\_KEY} como fallback.
+
+\section{Scripts operativos}
+
+\begin{itemize}
+  \item \file{corepack pnpm dev}: arranque local.
+  \item \file{corepack pnpm build}: compilación de producción.
+  \item \file{corepack pnpm verify}: lint + typecheck + tests + build.
+  \item \file{corepack pnpm test}: pruebas unitarias.
+  \item \file{corepack pnpm test:e2e}: pruebas end-to-end.
+\end{itemize}
+
+\section{Seed y carga inicial}
+
+El seed crea equipos, usuarios y materiales base del taller. También existe una carga masiva de inventario en \file{scripts/} con versión SQL y versión CJS.
+
+\section{Pruebas}
+
+\begin{itemize}
+  \item Vitest valida la lógica pura de inventario.
+  \item Playwright cubre login, redirecciones por rol y flujos de acciones.
+  \item El pipeline de verificación intenta detectar errores antes del despliegue.
+\end{itemize}
+
+\section{Reportes (Admin)}
+
+La vista \file{/dashboard/reportes} permite:
+
+\begin{itemize}
+  \item Filtrar movimientos por período (hora, día, semana, mes), tipo de movimiento, equipo y material.
+  \item Visualizar resultados paginados con columnas: fecha, tipo, material, cantidad, equipo, usuario, comentario.
+  \item Exportar a CSV mediante una Server Action que genera el archivo en el servidor.
+\end{itemize}
+
+% ═══════════════════════════════════════════════════════════
+% CHAPTER 7 — UI/UX Y DISEÑO
+% ═══════════════════════════════════════════════════════════
+\chapter{UI/UX y diseño}
+
+\section{Identidad visual institucional}
+
+El diseño se basa en los colores institucionales del CECYTE, definidos en el tema extendido de Tailwind (\file{tailwind.config.ts}):
+
+\begin{table}[H]
+\centering
+\caption{Paleta de colores CECYTE}
+\begin{tabular}{@{}L{5cm}L{4cm}L{6.5cm}@{}}
+\toprule
+\rowcolor{cecyteLight}
+\textbf{Color} & \textbf{Hex} & \textbf{Uso} \\
+\midrule
+Verde CECYTE primario & \file{\#006341} & Sidebar, header, botones principales \\
+Verde CECYTE oscuro   & \file{\#004d35} & Hover states \\
+Verde CECYTE claro    & \file{\#e6f0ec} & Fondos suaves, badges \\
+Naranja acento        & \file{\#F97316} & Alertas de stock bajo \\
+Rojo                  & \file{\#EF4444} & Errores, materiales agotados, acciones destructivas \\
+Verde claro           & \file{\#22C55E} & Confirmaciones, material disponible \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Stack de diseño}
+
+\begin{table}[H]
+\centering
+\caption{Herramientas de diseño}
+\begin{tabular}{@{}L{5cm}L{10.5cm}@{}}
+\toprule
+\rowcolor{cecyteLight}
+\textbf{Elemento} & \textbf{Herramienta} \\
+\midrule
+Framework CSS      & Tailwind CSS 3.4 \\
+Componentes UI     & shadcn/ui (base-nova, Radix) \\
+Iconos             & Lucide React (1.14.0) \\
+Gráficos           & Recharts (3.8.1) \\
+Tipografía         & Inter (variable font) \\
+CSS Variables      & shadcn/ui theming system \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Directrices de interfaz}
+
+\subsection{Botones y acciones}
+
+\begin{itemize}
+  \item Altura mínima de 48px para accesibilidad táctil.
+  \item Color por función semántica:
+    \begin{itemize}
+      \item Verde institucional: acciones principales (crear, confirmar, pedir).
+      \item Gris: acciones secundarias (cancelar, volver).
+      \item Rojo: acciones destructivas (eliminar).
+    \end{itemize}
+  \item Iconos siempre acompañados de texto hasta que el usuario se familiarice con la interfaz.
+  \item Confirmación visible tras cada acción exitosa.
+\end{itemize}
+
+\subsection{Formularios}
+
+\begin{itemize}
+  \item Etiquetas explícitas en todos los campos (no depender de placeholders).
+  \item Campos numéricos con etiquetas como \textit{«Cantidad inicial»} y \textit{«Stock mínimo»}, no solo valores por defecto.
+  \item Campo de contraseña sin placeholder engañoso de puntos cuando está vacío.
+  \item Botón para mostrar/ocultar contraseña en el login.
+  \item Validación tanto client-side como server-side con mensajes de error descriptivos.
+\end{itemize}
+
+\subsection{Regla de 3 clics}
+
+Toda operación del representante debe completarse en 3 acciones o menos:
+
+\begin{itemize}
+  \item \textbf{Pedir:} ver materiales → elegir cantidad → confirmar.
+  \item \textbf{Devolver:} ver préstamos activos → seleccionar → confirmar.
+  \item \textbf{Consumir:} ver consumibles → reportar cantidad → confirmar.
+\end{itemize}
+
+\subsection{Diseño responsive}
+
+\begin{itemize}
+  \item \textbf{Mobile-first:} diseñado para pantallas desde 375px (teléfonos de los alumnos).
+  \item Layout single column en móvil, 2 columnas en tablet, 3+ columnas en desktop.
+  \item \textbf{Admin:} sidebar fija en desktop (\file{md:w-64}), bottom tab bar en móvil (5 pestañas: Dashboard, Materiales, Equipos, Usuarios, Reportes).
+  \item \textbf{Representante:} header sticky con nombre del equipo, bottom tab bar en móvil (Pedir, Devolver).
+  \item Tablas de datos que se convierten en cards apiladas en pantallas pequeñas.
+\end{itemize}
+
+\section{Distribución del Dashboard (Admin)}
+
+El panel principal del administrador (\file{/dashboard}) organiza 9 KPIs en cards y gráficos:
+
+\begin{verbatim}
++------------------------------------------------------+
+|  Dashboard                                [Período v]|
++----------+----------+----------+---------------------+
+|   KPI 1  |   KPI 3  |   KPI 7  |                     |
+| Material |  Stock   |  Tasa    |      KPI 2          |
+|  total   |   Bajo   |devolución|   Prestado vs       |
+|          |          |          |   Disponible        |
++----------+----------+----------+---------------------+
+|             KPI 6 - Movimientos por período          |
+|             (Gráfico de líneas)                      |
++---------------------------+-------------------------+
+|   KPI 4                   |   KPI 5                 |
+|   Top 5 materiales        |   Equipos más activos   |
+|   (Barras horizontal)     |   (Barras vertical)     |
++---------------------------+-------------------------+
+|   KPI 9 - Consumibles agotados (Tabla)              |
++-----------------------------------------------------+
+|              KPI 8 - Estado de materiales            |
+|              (Gráfico de anillo)                     |
++-----------------------------------------------------+
+\end{verbatim}
+
+\section{Panel del Representante}
+
+El panel del representante (\file{/equipo}) muestra:
+
+\begin{itemize}
+  \item Tarjeta superior con nombre del representante y equipo.
+  \item Catálogo de materiales disponibles con cantidades en tiempo real.
+  \item Sección de préstamos activos de su equipo con acciones de devolución.
+  \item Botones para solicitar préstamo y reportar consumo.
+  \item Indicador \textit{«Inventario en vivo»} que muestra el estado de la conexión Realtime.
+\end{itemize}
+
+\section{Actualización en tiempo real}
+
+El componente \file{RealtimeRefresh} (\file{src/components/realtime-refresh.tsx}):
+
+\begin{itemize}
+  \item Es un Client Component que se suscribe a cambios en las tablas \file{materiales} y \file{prestamos} mediante Supabase Realtime.
+  \item Cuando detecta un cambio (INSERT, UPDATE, DELETE), llama a \file{router.refresh()} para que Next.js revalide los Server Components.
+  \item Muestra un indicador visual de estado de la conexión y un botón de refresco manual.
+  \item Aparece tanto en el layout del admin como en el del representante.
+\end{itemize}
+
+\section{Formulario de login}
+
+La página \file{/login} incluye:
+
+\begin{itemize}
+  \item Campos de correo y contraseña con validación client-side.
+  \item Botón para mostrar/ocultar contraseña (icono de ojo).
+  \item Botón \textit{«Continuar con Google»} para OAuth institucional.
+  \item Aviso \textit{«¿Necesitas una cuenta?»} que indica que Google no asigna permisos automáticamente.
+  \item Mensajes de error descriptivos para credenciales inválidas y cuentas sin perfil.
+\end{itemize}
+
+\section{Decisiones UX relevantes}
+
+\begin{itemize}
+  \item Retroalimentación visual inmediata en formularios.
+  \item Navegación móvil específica por rol.
+  \item Búsquedas tolerantes a acentos y mayúsculas.
+  \item Tablas y tarjetas simples para lectura rápida.
+  \item Actualización en vivo para evitar estados obsoletos.
+\end{itemize}
+
+\section{Componentes reutilizables}
+
+\begin{table}[H]
+\centering
+\caption{Componentes reutilizables principales}
+\begin{tabular}{@{}L{4cm}L{11.5cm}@{}}
+\toprule
+\rowcolor{cecyteLight}
+\textbf{Componente} & \textbf{Descripción} \\
+\midrule
+ManagedForm & Envoltorio para Server Actions con feedback visual. \\
+SearchBox & Búsqueda unificada con conteo de resultados y debounce de 300ms. \\
+RealtimeRefresh & Refresco automático por cambios en tiempo real vía Supabase Realtime. \\
+KpiCard & Tarjeta KPI de alto contraste. \\
+PeriodSelector & Selector de período para el dashboard. \\
+Gráficos & Barras, líneas y donuts con Recharts. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ═══════════════════════════════════════════════════════════
+% CHAPTER 8 — COMPONENTES
+% ═══════════════════════════════════════════════════════════
+\chapter{Componentes}
+
+El proyecto sigue un patrón de componentes organizados en tres niveles:
+
+\begin{enumerate}
+  \item \textbf{Componentes UI base} (\file{src/components/ui/}): primitivas de shadcn/ui generadas mediante el CLI.
+  \item \textbf{Componentes de dominio} (\file{src/components/dashboard/}, \file{src/components/forms/}): componentes específicos del negocio.
+  \item \textbf{Componentes de infraestructura}: utilidades transversales como refresco en tiempo real y búsqueda.
+\end{enumerate}
+
+\section{Componente \texttt{RealtimeRefresh}}
+
+\begin{itemize}
+  \item \textbf{Ubicación:} \file{src/components/realtime-refresh.tsx}.
+  \item \textbf{Tipo:} Client Component (\file{'use client'}).
+  \item \textbf{Props:}
+    \begin{itemize}
+      \item \file{showStatus?: boolean} — muestra indicador de conexión activa.
+      \item \file{label?: string} — texto opcional del botón.
+    \end{itemize}
+  \item \textbf{Funcionamiento:}
+    \begin{enumerate}
+      \item Crea un canal de Supabase Realtime suscrito a cambios en las tablas \file{materiales} y \file{prestamos}.
+      \item Al recibir un evento de cambio, invoca \file{router.refresh()} del App Router.
+      \item Esto fuerza que los Server Components se re-ejecuten y obtengan datos frescos.
+    \end{enumerate}
+  \item Se integra en ambos layouts: \file{(dashboard)/layout.tsx} y \file{(equipo)/layout.tsx}.
+\end{itemize}
+
+\section{Componente \texttt{SearchBox}}
+
+\begin{itemize}
+  \item \textbf{Ubicación:} \file{src/components/search-box.tsx}.
+  \item \textbf{Tipo:} Client Component.
+  \item \textbf{Props:}
+    \begin{itemize}
+      \item \file{placeholder?: string} — placeholder del campo de búsqueda.
+    \end{itemize}
+  \item \textbf{Funcionamiento:}
+    \begin{enumerate}
+      \item Lee el valor inicial de \file{URLSearchParams}.
+      \item Implementa debounce de 300ms para evitar peticiones excesivas.
+      \item Al cambiar el valor, actualiza \file{searchParams} en la URL, lo que dispara un re-render del Server Component padre.
+    \end{enumerate}
+  \item Se usa en catálogo de materiales, lista de equipos y lista de usuarios.
+\end{itemize}
+
+\section{Componentes de formularios}
+
+Ubicados en \file{src/components/forms/}, incluyen formularios reutilizables para:
+
+\begin{itemize}
+  \item Creación y edición de materiales.
+  \item Creación y edición de equipos.
+  \item Creación y edición de usuarios.
+  \item Restablecimiento de contraseña.
+  \item Entrada de stock.
+  \item Solicitud de préstamo.
+  \item Devolución de material.
+  \item Reporte de consumo.
+\end{itemize}
+
+Cada formulario sigue el patrón de Server Actions: el \file{action} del formulario apunta directamente a la función exportada con \file{'use server'}.
+
+\section{Componentes del dashboard}
+
+Ubicados en \file{src/components/dashboard/}, incluyen:
+
+\begin{itemize}
+  \item Gráficos Recharts (barras, líneas, anillos) para cada KPI.
+  \item Cards de KPIs con número grande, etiqueta e icono.
+  \item Tablas de datos con paginación y ordenamiento.
+  \item Indicadores de stock bajo con color condicional.
+\end{itemize}
+
+\section{Componentes UI (shadcn/ui)}
+
+Generados mediante \file{npx shadcn@latest add} y ubicados en \file{src/components/ui/}. Incluyen:
+
+\begin{itemize}
+  \item \file{button.tsx} — variantes: default, destructive, outline, secondary, ghost, link.
+  \item \file{card.tsx} — Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter.
+  \item \file{input.tsx} — campo de texto estilizado.
+  \item \file{label.tsx} — etiqueta accesible.
+  \item \file{dialog.tsx} — modal accesible basado en Radix.
+  \item \file{select.tsx} — selector desplegable.
+  \item \file{table.tsx} — tabla con header, body, row, cell.
+  \item \file{badge.tsx} — etiqueta de estado con variantes de color.
+  \item \file{dropdown-menu.tsx} — menú contextual.
+  \item \file{skeleton.tsx} — placeholder de carga.
+  \item \file{toast.tsx} / \file{toaster.tsx} — notificaciones toast.
+\end{itemize}
+
+Todos heredan el tema de shadcn/ui configurado en \file{components.json} (estilo base-nova, colores neutral, CSS variables).
+
+\section{Clientes Supabase}
+
+Aunque no son componentes React, los clientes Supabase son utilidades reutilizables clave:
+
+\begin{itemize}
+  \item \file{src/lib/supabase/server.ts} — exporta dos funciones:
+    \begin{itemize}
+      \item \file{createClient()}: cliente con cookies de sesión para Server Components, Server Actions y Route Handlers. Lee y escribe cookies mediante \pkg{next/headers}.
+      \item \file{createAdminClient()}: cliente con \textit{service\_role} para operaciones privilegiadas. No usa cookies de usuario para que la sesión autenticada no reemplace el header de autorización y bloquee RLS.
+    \end{itemize}
+  \item \file{src/lib/supabase/client.ts} — cliente para el navegador usando \file{createBrowserClient} de \pkg{@supabase/ssr}.
+\end{itemize}
+
+\section{Consideraciones de diseño}
+
+\begin{itemize}
+  \item \textbf{Server Components por defecto:} la mayoría de las páginas son Server Components que consultan Supabase directamente. Solo los componentes que necesitan interactividad (Realtime, búsqueda) son Client Components.
+  \item \textbf{Separación de lecturas y escrituras:} las lecturas usan \file{createClient()} (respeta RLS); las escrituras usan \file{createAdminClient()} (\textit{service\_role}, evita bloqueos de RLS). Esto permite que las políticas RLS protejan las lecturas mientras las mutaciones complejas se manejan con lógica de validación en las Server Actions.
+  \item \textbf{Revalidación explícita:} cada Server Action llama a \file{revalidatePath()} para las rutas afectadas, asegurando que los Server Components se re-ejecuten tras cada mutación.
+\end{itemize}
+
+% ═══════════════════════════════════════════════════════════
+% CHAPTER 9 — ANEXOS
+% ═══════════════════════════════════════════════════════════
+\chapter{Anexos}
+
+\section{Observaciones importantes}
+
+\begin{itemize}
+  \item El proyecto depende de Supabase Realtime para refrescar datos sin polling manual.
+  \item Las mutaciones administrativas usan service role y deben mantenerse aisladas del cliente.
+  \item La documentación Markdown existente en \file{docs/} sigue siendo útil como respaldo temático.
+\end{itemize}
+
+\section{Decisiones de diseño del documento}
+
+\begin{itemize}
+  \item Documento unificado a partir de las secciones previamente modulares. La fusión preserva el contenido completo de las versiones detalladas (\file{02\_stack\_arquitectura.tex}, \file{03\_estructura\_proyecto.tex}, \file{04\_autenticacion\_roles.tex}, \file{05\_modelo\_datos.tex}, \file{06\_flujos\_funcionales.tex}, \file{07\_ui\_ux.tex}, \file{08\_componentes.tex}) junto con los combinados originales.
+  \item Compilación con pdfLaTeX (requiere los paquetes estándar de TeX Live: \pkg{lmodern}, \pkg{microtype}, \pkg{titlesec}, \pkg{listings}, \pkg{tcolorbox}, \pkg{fancyhdr}).
+  \item Los nombres de archivo y código se renderizan con \pkg{listings} en modo inline; las rutas largas dentro de tablas pueden requerir ajuste manual si el ancho de columna resulta insuficiente.
+\end{itemize}
+
+\end{document}

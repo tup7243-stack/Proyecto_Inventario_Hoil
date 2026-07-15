@@ -1,4 +1,4 @@
-import { createEquipo, deleteEquipo, updateEquipo } from "@/lib/actions/admin";
+import { createEquipo, createEquipoPrestamo, deleteEquipo, updateEquipo } from "@/lib/actions/admin";
 import { ManagedForm } from "@/components/forms/managed-form";
 import { SearchBox } from "@/components/search-box";
 import { createClient } from "@/lib/supabase/server";
@@ -7,8 +7,20 @@ import { getSearchParam, matchesSearch } from "@/lib/search";
 interface EquipoRow {
   id: string;
   nombre: string;
-  perfiles: { id: string; nombre: string; matricula: string }[] | null;
+  perfiles: { id: string; nombre: string; matricula: string; rol: string }[] | null;
   prestamos: { id: string; estado: string }[] | null;
+}
+
+interface MaterialRow {
+  id: string;
+  nombre: string;
+  cantidad_total: number;
+}
+
+interface PrestamoRow {
+  material_id: string;
+  cantidad_prestada: number;
+  cantidad_devuelta: number | null;
 }
 
 export default async function EquiposPage({
@@ -18,12 +30,28 @@ export default async function EquiposPage({
 }) {
   const search = getSearchParam(searchParams);
   const supabase = await createClient();
-  const { data: equipos } = await supabase
-    .from("equipos")
-    .select("id, nombre, perfiles(id, nombre, matricula), prestamos(id, estado)")
-    .order("nombre");
+  const [
+    { data: equipos },
+    { data: materiales },
+    { data: prestamos },
+  ] = await Promise.all([
+    supabase
+      .from("equipos")
+      .select("id, nombre, perfiles(id, nombre, matricula, rol), prestamos(id, estado)")
+      .order("nombre"),
+    supabase
+      .from("materiales")
+      .select("id, nombre, cantidad_total")
+      .eq("activo", true)
+      .order("nombre"),
+    supabase
+      .from("prestamos")
+      .select("material_id, cantidad_prestada, cantidad_devuelta")
+      .eq("estado", "activo"),
+  ]);
 
   const allEquipos = (equipos ?? []) as EquipoRow[];
+  const allMaterials = (materiales ?? []) as MaterialRow[];
   const filteredEquipos = allEquipos.filter((equipo) =>
     matchesSearch(search, [
       equipo.nombre,
@@ -33,6 +61,24 @@ export default async function EquiposPage({
       ]),
     ])
   );
+
+  const prestadoPorMaterial = new Map<string, number>();
+  for (const prestamo of (prestamos ?? []) as PrestamoRow[]) {
+    const pendiente =
+      prestamo.cantidad_prestada - (prestamo.cantidad_devuelta ?? 0);
+    prestadoPorMaterial.set(
+      prestamo.material_id,
+      (prestadoPorMaterial.get(prestamo.material_id) ?? 0) + pendiente,
+    );
+  }
+
+  const materialesConDisponible = allMaterials.map((material) => ({
+    ...material,
+    disponible: Math.max(
+      0,
+      material.cantidad_total - (prestadoPorMaterial.get(material.id) ?? 0)
+    ),
+  }));
 
   return (
     <div className="space-y-6">
@@ -73,6 +119,10 @@ export default async function EquiposPage({
 
       <section className="grid gap-4 md:grid-cols-2">
         {filteredEquipos.map((equipo) => {
+          const representantes = (equipo.perfiles ?? []).filter((perfil) => perfil.rol === "representante");
+          const puedeCrearPrestamo =
+            representantes.length > 0 &&
+            materialesConDisponible.some((material) => material.disponible > 0);
           const prestamosActivos = (equipo.prestamos ?? []).filter(
             (prestamo) => prestamo.estado === "activo"
           ).length;
@@ -98,7 +148,7 @@ export default async function EquiposPage({
               <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
                 <div className="rounded-md bg-muted p-3">
                   <p className="text-xs text-muted-foreground">Representantes</p>
-                  <p className="font-semibold">{equipo.perfiles?.length ?? 0}</p>
+                  <p className="font-semibold">{representantes.length}</p>
                 </div>
                 <div className="rounded-md bg-muted p-3">
                   <p className="text-xs text-muted-foreground">Préstamos activos</p>
@@ -107,14 +157,79 @@ export default async function EquiposPage({
               </div>
 
               <div className="mt-4 space-y-2">
-                {(equipo.perfiles ?? []).length === 0 ? (
+                {representantes.length === 0 ? (
                   <p className="text-xs text-muted-foreground">Sin representante asignado.</p>
                 ) : (
-                  equipo.perfiles?.map((perfil) => (
+                  representantes.map((perfil) => (
                     <div key={perfil.id} className="rounded-md border px-3 py-2 text-sm">
                       {perfil.nombre} · Matrícula {perfil.matricula}
                     </div>
                   ))
+                )}
+              </div>
+
+              <div className="mt-4 border-t pt-4">
+                <h3 className="mb-2 text-sm font-medium">Crear préstamo</h3>
+                {representantes.length > 0 ? (
+                  <ManagedForm
+                    action={createEquipoPrestamo}
+                    successMessage="Préstamo creado correctamente."
+                    resetOnSuccess
+                    className="space-y-2"
+                  >
+                    <input type="hidden" name="equipo_id" value={equipo.id} />
+                    <select
+                      name="representante_id"
+                      required
+                      className="w-full rounded-md border px-3 py-2 text-sm"
+                    >
+                      <option value="" disabled>
+                        Selecciona un representante
+                      </option>
+                      {representantes.map((perfil) => (
+                        <option key={perfil.id} value={perfil.id}>
+                          {perfil.nombre} · {perfil.matricula}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      name="material_id"
+                      required
+                      className="w-full rounded-md border px-3 py-2 text-sm"
+                    >
+                      <option value="">Selecciona un material</option>
+                      {materialesConDisponible.map((m) => {
+                        const disp = m.disponible;
+                        return (
+                          <option
+                            key={m.id}
+                            value={m.id}
+                            disabled={disp === 0}
+                          >
+                            {m.nombre} (Disponible: {disp})
+                          </option>
+                        );
+                      })}
+                    </select>
+                    <input
+                      name="cantidad"
+                      type="number"
+                      min="1"
+                      placeholder="Cantidad a prestar"
+                      required
+                      className="w-full rounded-md border px-3 py-2 text-sm"
+                    />
+                    <button
+                      disabled={!puedeCrearPrestamo}
+                      className="w-full rounded-md bg-cecyte-primary px-4 py-2 text-sm font-medium text-white hover:bg-cecyte-dark disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground"
+                    >
+                      Crear préstamo
+                    </button>
+                  </ManagedForm>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    Asigna al menos un representante para crear préstamos.
+                  </p>
                 )}
               </div>
 

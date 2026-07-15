@@ -45,7 +45,7 @@ async function requireRepresentante() {
   };
 }
 
-async function getDisponible(materialId: string) {
+export async function getDisponible(materialId: string) {
   const supabase = await createAdminClient();
   const [{ data: material, error: materialError }, { data: prestamos }] =
     await Promise.all([

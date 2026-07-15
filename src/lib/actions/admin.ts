@@ -2,6 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
+import {
+  calcularDisponible,
+  validarCantidadDisponible,
+} from "@/lib/domain/inventory";
 
 export type MaterialCategoria =
   | "herramienta_manual"
@@ -352,6 +356,113 @@ export async function addMaterialStock(formData: FormData) {
 
   revalidatePath("/dashboard/materiales");
   revalidatePath("/dashboard");
+}
+
+export async function createEquipoPrestamo(formData: FormData) {
+  const adminId = await requireAdmin();
+  const supabase = await createAdminClient();
+
+  const equipoId = getString(formData, "equipo_id");
+  const representanteId = getString(formData, "representante_id");
+  const materialId = getString(formData, "material_id");
+  const cantidad = getPositiveInt(formData, "cantidad");
+  const comentario =
+    getString(formData, "comentario") || "Préstamo creado por administrador";
+
+  if (!equipoId || !representanteId || !materialId) {
+    throw new Error("Equipo, representante y material son requeridos.");
+  }
+
+  const [{ data: representante, error: representanteError }, { data: material, error: materialError }] =
+    await Promise.all([
+      supabase
+        .from("perfiles")
+        .select("id, equipo_id, rol")
+        .eq("id", representanteId)
+        .eq("equipo_id", equipoId)
+        .single(),
+      supabase
+        .from("materiales")
+        .select("id, cantidad_total, categoria, activo")
+        .eq("id", materialId)
+        .single(),
+    ]);
+
+  if (representanteError || !representante || representante.rol !== "representante") {
+    throw new Error("El representante seleccionado no pertenece a ese equipo.");
+  }
+
+  if (materialError || !material) {
+    throw new Error(materialError?.message ?? "Material no encontrado.");
+  }
+
+  if (!material.activo) {
+    throw new Error("Este material ya no está disponible.");
+  }
+
+  const { data: prestamos } = await supabase
+    .from("prestamos")
+    .select("cantidad_prestada, cantidad_devuelta")
+    .eq("material_id", materialId)
+    .eq("estado", "activo");
+
+  const disponible = calcularDisponible(
+    material.cantidad_total,
+    (prestamos ?? []).map((prestamo) => ({
+      cantidad_prestada: prestamo.cantidad_prestada,
+      cantidad_devuelta: prestamo.cantidad_devuelta,
+    }))
+  );
+
+  const validationError = validarCantidadDisponible(cantidad, disponible);
+  if (validationError) throw new Error(validationError);
+
+  const { data: prestamo, error: prestamoError } = await supabase
+    .from("prestamos")
+    .insert({
+      equipo_id: equipoId,
+      representante_id: representanteId,
+      material_id: materialId,
+      cantidad_prestada: cantidad,
+      cantidad_devuelta: 0,
+      estado: "activo",
+    })
+    .select("id")
+    .single();
+
+  if (prestamoError || !prestamo) {
+    throw new Error(prestamoError?.message ?? "No se pudo crear el préstamo.");
+  }
+
+  const { data: movimiento, error: movimientoError } = await supabase
+    .from("movimientos")
+    .insert({
+      tipo: "salida_prestamo",
+      material_id: materialId,
+      cantidad,
+      equipo_id: equipoId,
+      usuario_id: adminId,
+      prestamo_id: prestamo.id,
+      comentario,
+    })
+    .select("id")
+    .single();
+
+  if (movimientoError || !movimiento) {
+    throw new Error(movimientoError?.message ?? "No se pudo registrar el movimiento.");
+  }
+
+  const { error: updateError } = await supabase
+    .from("prestamos")
+    .update({ movimiento_salida_id: movimiento.id })
+    .eq("id", prestamo.id);
+
+  if (updateError) throw new Error(updateError.message);
+
+  revalidatePath("/dashboard/equipos");
+  revalidatePath("/dashboard/materiales");
+  revalidatePath("/dashboard");
+  revalidatePath("/equipo");
 }
 
 export async function createEquipo(formData: FormData) {
